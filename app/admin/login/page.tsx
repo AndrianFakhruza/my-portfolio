@@ -7,8 +7,8 @@ import { Lock, ArrowLeft, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("fakhruzaandrian561@gmail.com");
-  const [password, setPassword] = useState("Admin12345!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,13 +89,6 @@ export default function AdminLoginPage() {
             <p className="text-sm text-paper-500 dark:text-paper-400 mt-1">
               Kelola konten portofolio Andrian Fakhruza.
             </p>
-          </div>
-
-          {/* Credential hint */}
-          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 space-y-0.5">
-            <p className="font-semibold text-amber-700 dark:text-[#F59E0B] mb-1">Kredensial default:</p>
-            <p>Email: <span className="font-mono font-medium">fakhruzaandrian561@gmail.com</span></p>
-            <p>Password: <span className="font-mono font-medium">Admin12345!</span></p>
           </div>
 
           {error && (
