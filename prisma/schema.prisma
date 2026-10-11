@@ -1,0 +1,106 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  type      String    @default("desain") // desain, website, branding, dll.
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  summary     String   @db.Text
+  content     String   @db.Text // Full Markdown Case Study: Masalah, Proses, Hasil
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  tags        String   // comma separated: "Design System, Next.js, Fintech"
+  cover       String   @db.Text // Image URL or local path
+  gallery     String   @db.Text // JSON string of gallery images [{url, caption}]
+  role        String   // e.g. "Lead Product Designer & Frontend Dev"
+  tools       String   // e.g. "Figma, React, Tailwind CSS, TypeScript"
+  liveUrl     String?  @db.Text // https://...
+  repoUrl     String?  @db.Text // https://github.com/...
+  featured    Boolean  @default(false)
+  status      String   @default("published") // published, draft
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String   @db.Text
+  content     String   @db.Text // Full Markdown
+  cover       String   @db.Text
+  tags        String   // comma separated
+  status      String   @default("published") // published, draft, scheduled
+  readingTime String   @default("5 min")
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  body      String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AboutProfile {
+  id        String   @id @default(cuid())
+  name      String   @default("Andrian Fakhruza")
+  tagline   String   @db.Text
+  bio1      String   @db.Text // paragraph 1
+  bio2      String   @db.Text // paragraph 2
+  location  String   @default("Lhokseumawe, Aceh")
+  cvUrl     String?  @db.Text // path to CV file
+  updatedAt DateTime @updatedAt
+}
+
+model Experience {
+  id          String   @id @default(cuid())
+  period      String   // e.g. "2022 – 2024"
+  role        String
+  company     String
+  description String   @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Capability {
+  id        String   @id @default(cuid())
+  title     String
+  skills    String   @db.Text // newline-separated list of skills
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

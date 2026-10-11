@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary:    #F8F8F8;
+  --bg-secondary:  #FFFFFF;
+  --bg-tertiary:   #F4F4F5;
+  --text-primary:  #18181B;
+  --text-secondary:#52525B;
+  --text-muted:    #71717A;
+  --border-color:  #E4E4E7;
+  --accent-color:  #F59E0B;
+  --accent-hover:  #D97706;
+  --accent-soft:   rgba(245, 158, 11, 0.10);
+  --card-bg:       #FFFFFF;
+  --glass-bg:      rgba(255, 255, 255, 0.90);
+  --glass-border:  rgba(228, 228, 231, 0.85);
+}
+
+.dark {
+  --bg-primary:    #18181B;
+  --bg-secondary:  #202024;
+  --bg-tertiary:   #27272A;
+  --text-primary:  #F8F8F8;
+  --text-secondary:#D4D4D8;
+  --text-muted:    #A1A1AA;
+  --border-color:  #27272A;
+  --accent-color:  #F59E0B;
+  --accent-hover:  #FBBF24;
+  --accent-soft:   rgba(245, 158, 11, 0.16);
+  --card-bg:       #202024;
+  --glass-bg:      rgba(24, 24, 27, 0.90);
+  --glass-border:  rgba(39, 39, 42, 0.85);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image:
+    radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.04) 0px, transparent 50%),
+    radial-gradient(at 90% 90%, rgba(24, 24, 27, 0.03) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Smooth transition for theme toggle */
+body, header, nav, footer, main, section, article, aside, .glass-panel, .shadow-card, .btn-modern-primary, .btn-modern-secondary, .btn-modern-accent {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+}
+
+/* Modern Pill Badges */
+.badge-pill {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium tracking-wide transition-all duration-200;
+}
+
+/* Glass Card Container */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Button: primary */
+.btn-modern-primary {
+  @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold tracking-wide bg-[#18181B] text-white dark:bg-[#F8F8F8] dark:text-[#18181B] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300;
+}
+
+/* Button: amber accent */
+.btn-modern-accent {
+  @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold tracking-wide bg-[#F59E0B] text-[#18181B] shadow-lg shadow-amber-500/25 hover:bg-[#D97706] hover:text-white hover:shadow-xl hover:shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300;
+}
+
+/* Button: secondary outline */
+.btn-modern-secondary {
+  @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold tracking-wide bg-white dark:bg-[#202024] text-[#18181B] dark:text-[#F8F8F8] border border-paper-200 dark:border-paper-800 hover:border-[#F59E0B] hover:text-[#F59E0B] dark:hover:text-[#F59E0B] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--accent-color);
+  color: #18181B;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
