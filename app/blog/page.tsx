@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Refleksi, esai, dan panduan praktis seputar desain produk digital, rekayasa frontend, tipografi, dan arsitektur web oleh Andrian.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function BlogPage() {
   const posts = await prisma.post.findMany({

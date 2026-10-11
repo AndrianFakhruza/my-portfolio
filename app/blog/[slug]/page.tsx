@@ -10,6 +10,8 @@ import { Footer } from "@/components/footer";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { PostCard } from "@/components/post-card";
 
+export const dynamic = "force-dynamic";
+
 interface ArticleDetailProps {
   params: Promise<{ slug: string }>;
 }

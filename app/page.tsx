@@ -6,7 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ProjectCard } from "@/components/project-card";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 const TECH_STACK = [
   {

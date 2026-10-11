@@ -12,6 +12,8 @@ import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { TableOfContents } from "@/components/table-of-contents";
 import { ProjectCard } from "@/components/project-card";
 
+export const dynamic = "force-dynamic";
+
 interface ProjectDetailProps {
   params: Promise<{ slug: string }>;
 }

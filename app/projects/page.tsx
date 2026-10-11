@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Katalog lengkap hasil kerja desain antarmuka, aplikasi web modern, riset pengguna, dan rancangan sistem digital oleh Andrian.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
   const [projects, categories] = await Promise.all([
