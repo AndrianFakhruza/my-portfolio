@@ -122,7 +122,7 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
 
           {/* Hover Arrow */}
           <div className="absolute bottom-3 right-3 z-10 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-neutral-900 dark:bg-neutral-900 dark:text-white shadow-md">
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-paper-900 dark:bg-paper-800 dark:text-paper-100 border border-paper-200 dark:border-paper-700 shadow-md">
               <ArrowUpRight className="w-3.5 h-3.5" />
             </span>
           </div>
@@ -143,7 +143,7 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
 
       {/* Meta Footer */}
       <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 flex flex-wrap items-center justify-between gap-2 text-xs border-t border-paper-100 dark:border-paper-900/60 mt-1 pt-3">
-        <span className="text-[11px] font-medium text-paper-400 truncate max-w-[120px]">
+        <span className="text-[11px] font-medium text-paper-500 dark:text-paper-400 truncate max-w-[120px]">
           {project.role || "Product Designer"}
         </span>
 

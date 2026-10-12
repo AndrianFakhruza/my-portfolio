@@ -131,7 +131,7 @@ export function AdminMessagesView({ initialMessages }: { initialMessages: Messag
                     <div className="flex items-center justify-end gap-2">
                       <a
                         href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || "Diskusi Portofolio Andrian")}`}
-                        className="p-1.5 text-paper-600 hover:text-accent-500"
+                        className="p-1.5 text-paper-600 dark:text-paper-400 hover:text-accent-500 transition-colors"
                         title="Balas via Email"
                       >
                         <Send className="w-3.5 h-3.5" />

@@ -406,7 +406,7 @@ export function AdminProjectForm({
             </h3>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Status Rilis
               </label>
               <select
@@ -420,7 +420,7 @@ export function AdminProjectForm({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Kategori Proyek <span className="text-accent-500">*</span>
               </label>
               <select
@@ -449,7 +449,7 @@ export function AdminProjectForm({
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Urutan Tampil (Nomor)
               </label>
               <input
@@ -501,7 +501,7 @@ export function AdminProjectForm({
             </h3>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Peran (Role)
               </label>
               <input
@@ -514,7 +514,7 @@ export function AdminProjectForm({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Alat / Tools (pisahkan koma)
               </label>
               <input
@@ -527,7 +527,7 @@ export function AdminProjectForm({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Tagar / Tags (pisahkan koma)
               </label>
               <input
@@ -540,7 +540,7 @@ export function AdminProjectForm({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Tautan Live Demo (URL)
               </label>
               <input
@@ -553,7 +553,7 @@ export function AdminProjectForm({
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Tautan Repositori GitHub (URL)
               </label>
               <input

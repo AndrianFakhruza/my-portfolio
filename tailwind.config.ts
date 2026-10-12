@@ -44,6 +44,7 @@ const config: Config = {
           900: "#18181B", // User requested dark background
           950: "#09090B",
         },
+        "card-bg": "var(--card-bg)",
       },
       fontFamily: {
         sans:    ["var(--font-roboto-slab)", "var(--font-geist)", "system-ui", "-apple-system", "sans-serif"],

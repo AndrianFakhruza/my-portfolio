@@ -68,7 +68,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailProps) 
                 <Calendar className="w-3.5 h-3.5 text-accent-500" />
                 {formatDate(post.publishedAt)}
               </span>
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-paper-400">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-paper-500 dark:text-paper-400">
                 <Clock className="w-3.5 h-3.5" />
                 {post.readingTime}
               </span>
@@ -84,12 +84,17 @@ export default async function ArticleDetailPage({ params }: ArticleDetailProps) 
 
             {/* Author Row */}
             <div className="flex items-center gap-3.5 pt-4">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center font-display font-black text-sm shadow-md shadow-indigo-500/20">
-                AN
+              <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-accent-500/30 shadow-md">
+                <Image
+                  src="/profile.jpg"
+                  alt="Andrian Fakhruza"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div>
                 <p className="text-sm font-bold text-paper-900 dark:text-paper-100">Andrian Fakhruza</p>
-                <p className="text-xs text-paper-500 font-medium">Web Developer &amp; UI Designer</p>
+                <p className="text-xs text-paper-500 dark:text-paper-400 font-medium">Web Developer &amp; UI Designer</p>
               </div>
             </div>
           </header>

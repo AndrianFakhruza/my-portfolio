@@ -286,7 +286,7 @@ export function AdminPostForm({ initialData, isEditing = false }: AdminPostFormP
             </h3>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Status Publikasi
               </label>
               <select
@@ -300,7 +300,7 @@ export function AdminPostForm({ initialData, isEditing = false }: AdminPostFormP
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600">
+              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Tagar / Topik (pisahkan koma)
               </label>
               <input

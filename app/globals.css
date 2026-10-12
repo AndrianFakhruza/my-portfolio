@@ -68,6 +68,10 @@ body, header, nav, footer, main, section, article, aside, .glass-panel, .shadow-
   border: 1px solid var(--glass-border);
 }
 
+.bg-card-bg {
+  background-color: var(--card-bg);
+}
+
 /* Button: primary */
 .btn-modern-primary {
   @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold tracking-wide bg-[#18181B] text-white dark:bg-[#F8F8F8] dark:text-[#18181B] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300;

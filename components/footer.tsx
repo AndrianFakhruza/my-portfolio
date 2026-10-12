@@ -24,7 +24,7 @@ export function Footer() {
         {/* Top: Headline + Email */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-10 border-b border-paper-200/80 dark:border-paper-800/80">
           <div className="lg:col-span-6 space-y-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-paper-100 dark:bg-paper-850 text-[#18181B] dark:text-[#F8F8F8] border border-paper-200/80 dark:border-paper-700/80">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-paper-100 dark:bg-paper-800 text-[#18181B] dark:text-[#F8F8F8] border border-paper-200/80 dark:border-paper-700/80">
               Tersedia untuk kolaborasi
             </span>
             <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-paper-900 dark:text-paper-100 leading-tight">

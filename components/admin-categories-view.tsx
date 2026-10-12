@@ -229,7 +229,7 @@ export function AdminCategoriesView({ initialCategories }: { initialCategories: 
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-mono uppercase text-paper-600 hover:text-paper-900 dark:text-paper-400"
+                  className="px-4 py-2 text-xs font-mono uppercase text-paper-600 hover:text-paper-900 dark:text-paper-400 dark:hover:text-paper-100 transition-colors"
                 >
                   Batal
                 </button>
