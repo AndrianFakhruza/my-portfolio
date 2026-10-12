@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard, desc: "Ringkasan & metrik" },
@@ -39,19 +40,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = useCallback(
     async (reason?: string) => {
       try {
+        setLoggingOut(true);
         if (typeof window !== "undefined") {
           localStorage.removeItem("admin_last_activity");
         }
         await fetch("/api/auth/logout", { method: "POST" });
+        // Beri waktu animasi fade-out berjalan (500ms) sebelum redirect
+        await new Promise((resolve) => setTimeout(resolve, 450));
         const target = reason ? `/admin/login?reason=${reason}` : "/admin/login";
         router.push(target);
         router.refresh();
       } catch (e) {
         console.error("Logout error", e);
+        setLoggingOut(false);
       }
     },
     [router]
@@ -315,55 +321,112 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
 
-      {/* ─── Modal Konfirmasi Keluar ─── */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div
-            className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#1f1f23] border border-paper-200 dark:border-paper-800 p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
-            role="dialog"
-            aria-modal="true"
+      {/* ─── Full-page fade-out overlay saat logout ─── */}
+      <AnimatePresence>
+        {loggingOut && (
+          <motion.div
+            className="fixed inset-0 z-[999] bg-[#18181B] flex flex-col items-center justify-center gap-4 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0">
-                <LogOut className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-display font-bold text-base text-paper-900 dark:text-paper-100">
-                  Konfirmasi Keluar
-                </h3>
-                <p className="text-xs text-paper-500 dark:text-paper-400">
-                  Panel Administrator
-                </p>
-              </div>
-            </div>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05, duration: 0.3, ease: "easeOut" }}
+              className="w-12 h-12 rounded-2xl bg-rose-500/15 flex items-center justify-center"
+            >
+              <LogOut className="w-5 h-5 text-rose-400" />
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.3 }}
+              className="text-xs font-mono text-paper-400 tracking-widest uppercase"
+            >
+              Keluar dari sesi…
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            <p className="text-sm text-paper-600 dark:text-paper-300 leading-relaxed">
-              Apakah Anda yakin ingin keluar dari panel admin? Anda harus memasukkan kredensial lagi untuk login kembali.
-            </p>
+      {/* ─── Modal Konfirmasi Keluar ─── */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Backdrop blur */}
+            <motion.div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setShowLogoutModal(false)}
+            />
 
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 text-xs font-semibold rounded-xl border border-paper-200 dark:border-paper-700 text-paper-700 dark:text-paper-300 hover:bg-paper-100 dark:hover:bg-paper-800 transition-colors cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLogoutModal(false);
-                  handleLogout();
-                }}
-                className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/25 transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                Ya, Keluar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            {/* Dialog card */}
+            <motion.div
+              className="relative w-full max-w-sm rounded-2xl bg-white dark:bg-[#1f1f23] border border-paper-200 dark:border-paper-800 p-6 shadow-2xl space-y-4"
+              role="dialog"
+              aria-modal="true"
+              initial={{ opacity: 0, scale: 0.88, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 12 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="flex items-center gap-3">
+                <motion.div
+                  className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0"
+                  initial={{ rotate: -12, scale: 0.7 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ delay: 0.1, duration: 0.3, ease: "backOut" }}
+                >
+                  <LogOut className="w-5 h-5" />
+                </motion.div>
+                <div>
+                  <h3 className="font-display font-bold text-base text-paper-900 dark:text-paper-100">
+                    Konfirmasi Keluar
+                  </h3>
+                  <p className="text-xs text-paper-500 dark:text-paper-400">
+                    Panel Administrator
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-sm text-paper-600 dark:text-paper-300 leading-relaxed">
+                Apakah Anda yakin ingin keluar dari panel admin? Anda harus memasukkan kredensial lagi untuk login kembali.
+              </p>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutModal(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-paper-200 dark:border-paper-700 text-paper-700 dark:text-paper-300 hover:bg-paper-100 dark:hover:bg-paper-800 transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLogoutModal(false);
+                    handleLogout();
+                  }}
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/25 transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  Ya, Keluar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

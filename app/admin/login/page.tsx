@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Lock, ArrowLeft, Loader2, AlertCircle, Eye, EyeOff, Clock } from "lucide-react";
+import { motion } from "framer-motion";
 
 function LoginForm() {
   const router = useRouter();
@@ -42,7 +43,12 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-sm space-y-7">
+    <motion.div
+      className="w-full max-w-sm space-y-7"
+      initial={{ opacity: 0, y: 28 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div>
         <Link
           href="/"
@@ -159,15 +165,20 @@ function LoginForm() {
           )}
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 }
 
 export default function AdminLoginPage() {
   return (
-    <div className="min-h-screen flex bg-[#F8F8F8] dark:bg-[#18181B]">
-      {/* Left: decorative panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-[#18181B] p-12 flex-col justify-between overflow-hidden border-r border-[#27272A]">
+    <div className="min-h-screen flex bg-[#F8F8F8] dark:bg-[#18181B] overflow-hidden">
+      {/* Left: decorative panel — slides in from left */}
+      <motion.div
+        className="hidden lg:flex lg:w-1/2 relative bg-[#18181B] p-12 flex-col justify-between overflow-hidden border-r border-[#27272A]"
+        initial={{ x: -60, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      >
         {/* Grid pattern overlay */}
         <div
           className="absolute inset-0 opacity-10"
@@ -180,7 +191,12 @@ export default function AdminLoginPage() {
         <div className="absolute top-1/3 left-1/4 w-72 h-72 rounded-full bg-[#F59E0B]/15 blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-amber-600/10 blur-2xl" />
 
-        <div className="relative">
+        <motion.div
+          className="relative"
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
+        >
           <div className="relative w-11 h-11 rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-lg shadow-amber-500/25">
             <Image
               src="/profile.jpg"
@@ -191,20 +207,30 @@ export default function AdminLoginPage() {
               priority
             />
           </div>
-        </div>
+        </motion.div>
 
-        <div className="relative space-y-4">
+        <motion.div
+          className="relative space-y-4"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
           <h2 className="font-display text-4xl font-bold text-white leading-tight">
             Kelola portofolio<br />dengan mudah.
           </h2>
           <p className="text-paper-400 text-sm leading-relaxed max-w-xs">
             Dashboard terintegrasi untuk mengelola proyek, artikel, media, dan pesan kontak dalam satu panel.
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {/* Right: Login Form inside Suspense boundary */}
-      <div className="flex-1 flex items-center justify-center p-6">
+      {/* Right: Login Form — fades + slides up */}
+      <motion.div
+        className="flex-1 flex items-center justify-center p-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
         <Suspense
           fallback={
             <div className="flex items-center justify-center p-8">
@@ -214,7 +240,7 @@ export default function AdminLoginPage() {
         >
           <LoginForm />
         </Suspense>
-      </div>
+      </motion.div>
     </div>
   );
 }
