@@ -395,31 +395,79 @@ Desain yang hebat adalah desain yang inklusif dan tidak mengorbankan kenyamanan 
     console.log("Experiences seeded");
   }
 
-  // 8. Seed Capabilities
-  const existingCap = await prisma.capability.findFirst();
-  if (!existingCap) {
-    const capabilitiesData = [
-      {
-        title: "Web Development",
-        skills: "Next.js 15 & React (App Router)\nTypeScript & JavaScript Modern\nTailwind CSS & Responsive Design\nREST API & Server Actions\nPrisma ORM & Database Management",
-        order: 1,
-      },
-      {
-        title: "UI / UX Design",
-        skills: "Figma UI/UX & Wireframing\nPrototyping & Interactive Mockup\nDesain Sistem & Konsistensi Visual\nPrinsip Desain Responsif & Mobile-First\nAksesibilitas & User Experience",
-        order: 2,
-      },
-      {
-        title: "Tools & Workflow",
-        skills: "Git & Version Control Workflow\nVercel & Deployment Pipeline\nMySQL & Database Design\nLinux Command Line\nAgile & Scrum Basics",
-        order: 3,
-      },
-    ];
-    for (const cap of capabilitiesData) {
-      await prisma.capability.create({ data: cap });
-    }
-    console.log("Capabilities seeded");
+  // 8. Seed Capabilities (Hard Skills & Soft Skills)
+  await prisma.capability.deleteMany({});
+  const capabilitiesData = [
+    {
+      title: "Hard Skills & Alat Teknis",
+      skills: "Python\nFigma & UI/UX Design\nNext.js 15 & React\nTypeScript & JavaScript\nTailwind CSS\nEditing Video\nContent Creation\nMicrosoft Office\nREST API & Prisma ORM\nGit & Version Control",
+      order: 1,
+    },
+    {
+      title: "Soft Skills & Kolaborasi",
+      skills: "Manajemen Waktu\nKemampuan Berkomunikasi\nDisiplin dan Bertanggung Jawab\nKemampuan Berkolaborasi\nKemampuan Berorganisasi\nProblem Solving & Berpikir Kritis\nAdaptabilitas & Kemauan Belajar",
+      order: 2,
+    },
+  ];
+  for (const cap of capabilitiesData) {
+    await prisma.capability.create({ data: cap });
   }
+  console.log("Capabilities updated");
+
+  // 9. Seed Education
+  await prisma.education.deleteMany({});
+  const educationsData = [
+    {
+      institution: "Politeknik Negeri Lhokseumawe",
+      degree: "Sarjana Terapan Teknik Informatika",
+      period: "Agustus 2022 – Agustus 2026",
+      score: "IPK: 3,67 / 4,00",
+      description: "Fokus pada rekayasa perangkat lunak, pemrograman web modern, struktur data, pengolahan basis data, dan kecerdasan buatan.",
+      order: 1,
+    },
+    {
+      institution: "SMA Negeri Modal Bangsa Arun",
+      degree: "MIPA / Sekolah Unggulan",
+      period: "Juli 2019 – Mei 2022",
+      score: "Nilai Akhir: 93,62",
+      description: "Aktif dalam organisasi kepemimpinan sekolah dan pengembangan potensi akademik sains & teknologi.",
+      order: 2,
+    },
+  ];
+  for (const edu of educationsData) {
+    await prisma.education.create({ data: edu });
+  }
+  console.log("Educations seeded");
+
+  // 10. Seed Organizations
+  await prisma.organization.deleteMany({});
+  const organizationsData = [
+    {
+      role: "Ketua Bagian Perlengkapan dan Dekorasi",
+      organization: "Pormatik (Pekan Olahraga & Seni Mahasiswa Informatika)",
+      period: "2023",
+      description: "• Merencanakan dan mengatur segala kebutuhan perlengkapan dan dekorasi untuk acara, termasuk pemilihan tema dan pengadaan peralatan.\n• Mengelola anggaran yang dialokasikan untuk perlengkapan dan dekorasi.\n• Memimpin dan mengkoordinasi tim dalam persiapan dan pelaksanaan dekorasi serta perlengkapan acara.",
+      order: 1,
+    },
+    {
+      role: "Ketua Palang Merah Remaja",
+      organization: "SMA Negeri Modal Bangsa Arun",
+      period: "2021 – 2022",
+      description: "• Memimpin dan mengelola organisasi PMR, termasuk pembagian tugas dan pelatihan anggota.\n• Mengawasi pelaksanaan kegiatan dan memberikan pertolongan saat diperlukan di berbagai acara sekolah.\n• Menginisiasi latihan bersama dengan sekolah lain untuk bertukar pengalaman dan mempererat hubungan antar sekolah.",
+      order: 2,
+    },
+    {
+      role: "Anggota Divisi DigiHub",
+      organization: "Komunitas Mahasiswa IT (Komit) PNL",
+      period: "2024 – Sekarang",
+      description: "• Bertanggung jawab dalam menyusun caption kreatif dan informatif untuk setiap konten yang dipublikasikan di media sosial komunitas.\n• Aktif terlibat dalam seluruh kegiatan Komit, baik sebagai peserta maupun tim pelaksana.",
+      order: 3,
+    },
+  ];
+  for (const org of organizationsData) {
+    await prisma.organization.create({ data: org });
+  }
+  console.log("Organizations seeded");
 
   console.log("Seeding completed successfully!");
 

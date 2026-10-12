@@ -104,3 +104,26 @@ model Capability {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Education {
+  id          String   @id @default(cuid())
+  institution String
+  degree      String
+  period      String
+  score       String?
+  description String?  @db.Text
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Organization {
+  id           String   @id @default(cuid())
+  role         String
+  organization String
+  period       String
+  description  String   @db.Text
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
