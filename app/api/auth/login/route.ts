@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       value: token,
       httpOnly: true,
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 2, // 2 jam batas sesi aktif
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
     });

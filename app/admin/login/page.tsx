@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Lock, ArrowLeft, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+import { Lock, ArrowLeft, Loader2, AlertCircle, Eye, EyeOff, Clock } from "lucide-react";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const reason = searchParams.get("reason");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -27,7 +31,8 @@ export default function AdminLoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login gagal");
 
-      router.push("/admin");
+      const from = searchParams.get("from") || "/admin";
+      router.push(from);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Email atau kata sandi tidak valid.");
@@ -36,6 +41,129 @@ export default function AdminLoginPage() {
     }
   };
 
+  return (
+    <div className="w-full max-w-sm space-y-7">
+      <div>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-paper-500 hover:text-[#F59E0B] transition-colors mb-6"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Kembali ke Beranda
+        </Link>
+
+        <div className="relative w-12 h-12 rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-lg shadow-amber-500/20 mb-4">
+          <Image
+            src="/profile.jpg"
+            alt="Andrian Fakhruza"
+            fill
+            sizes="48px"
+            className="object-cover"
+            priority
+          />
+        </div>
+
+        <h1 className="font-display text-2xl font-bold tracking-tight text-paper-900 dark:text-paper-50">
+          Masuk ke Dashboard
+        </h1>
+        <p className="text-sm text-paper-500 dark:text-paper-400 mt-1">
+          Kelola konten portofolio Andrian Fakhruza.
+        </p>
+      </div>
+
+      {/* Notifikasi jika sesi berakhir karena inaktivitas atau timeout */}
+      {reason === "inactive" && (
+        <div className="p-3.5 rounded-xl border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
+          <Clock className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+          <div>
+            <p className="font-semibold">Sesi Anda telah berakhir</p>
+            <p className="text-[11px] opacity-90 mt-0.5">
+              Tidak ada aktivitas selama lebih dari 30 menit. Silakan masuk kembali demi keamanan.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {reason === "expired" && (
+        <div className="p-3.5 rounded-xl border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
+          <Clock className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+          <div>
+            <p className="font-semibold">Sesi telah kedaluwarsa</p>
+            <p className="text-[11px] opacity-90 mt-0.5">
+              Batas waktu sesi login telah habis. Silakan masuk kembali.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="p-3 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-paper-700 dark:text-paper-300">
+            Alamat Email
+          </label>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2.5 text-sm rounded-xl bg-white dark:bg-[#202024] border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-amber-500/15 text-paper-900 dark:text-paper-100 placeholder:text-paper-400 transition-all shadow-sm"
+            placeholder="email@domain.com"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-paper-700 dark:text-paper-300">
+            Kata Sandi
+          </label>
+          <div className="relative">
+            <input
+              type={showPass ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2.5 pr-10 text-sm rounded-xl bg-white dark:bg-[#202024] border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-amber-500/15 text-paper-900 dark:text-paper-100 transition-all shadow-sm"
+              placeholder="••••••••"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPass(!showPass)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-paper-400 hover:text-paper-600 dark:hover:text-paper-300 transition-colors cursor-pointer"
+            >
+              {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 px-4 text-sm font-bold rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-[#18181B] shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Memverifikasi...
+            </>
+          ) : (
+            <>
+              <Lock className="w-4 h-4" />
+              Masuk ke Dashboard
+            </>
+          )}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex bg-[#F8F8F8] dark:bg-[#18181B]">
       {/* Left: decorative panel */}
@@ -53,8 +181,15 @@ export default function AdminLoginPage() {
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-amber-600/10 blur-2xl" />
 
         <div className="relative">
-          <div className="w-10 h-10 rounded-xl bg-[#F59E0B] flex items-center justify-center shadow-lg shadow-amber-500/25">
-            <span className="text-[#18181B] font-display font-black text-lg">A</span>
+          <div className="relative w-11 h-11 rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-lg shadow-amber-500/25">
+            <Image
+              src="/profile.jpg"
+              alt="Andrian Fakhruza"
+              fill
+              sizes="44px"
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
 
@@ -68,93 +203,17 @@ export default function AdminLoginPage() {
         </div>
       </div>
 
-      {/* Right: Login Form */}
+      {/* Right: Login Form inside Suspense boundary */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm space-y-8">
-          <div>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-paper-500 hover:text-[#F59E0B] transition-colors mb-8"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Kembali ke Beranda
-            </Link>
-
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-lg shadow-amber-500/25 mb-4">
-              <Lock className="w-5 h-5 text-[#18181B]" />
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="w-6 h-6 animate-spin text-[#F59E0B]" />
             </div>
-            <h1 className="font-display text-2xl font-bold tracking-tight text-paper-900 dark:text-paper-50">
-              Masuk ke Dashboard
-            </h1>
-            <p className="text-sm text-paper-500 dark:text-paper-400 mt-1">
-              Kelola konten portofolio Andrian Fakhruza.
-            </p>
-          </div>
-
-          {error && (
-            <div className="p-3 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-paper-700 dark:text-paper-300">
-                Alamat Email
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm rounded-xl bg-white dark:bg-[#202024] border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-amber-500/15 text-paper-900 dark:text-paper-100 placeholder:text-paper-400 transition-all shadow-sm"
-                placeholder="email@domain.com"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-paper-700 dark:text-paper-300">
-                Kata Sandi
-              </label>
-              <div className="relative">
-                <input
-                  type={showPass ? "text" : "password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 pr-10 text-sm rounded-xl bg-white dark:bg-[#202024] border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-amber-500/15 text-paper-900 dark:text-paper-100 transition-all shadow-sm"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-paper-400 hover:text-paper-600 dark:hover:text-paper-300 transition-colors"
-                >
-                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 text-sm font-bold rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-[#18181B] shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Memverifikasi...
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4" />
-                  Masuk ke Dashboard
-                </>
-              )}
-            </button>
-          </form>
-        </div>
+          }
+        >
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );

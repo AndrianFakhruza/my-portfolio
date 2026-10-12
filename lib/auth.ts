@@ -17,7 +17,7 @@ export async function signSession(user: UserSession): Promise<string> {
   return await new SignJWT({ ...user })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("7d")
+    .setExpirationTime("2h") // 2 jam batas sesi
     .sign(JWT_SECRET);
 }
 

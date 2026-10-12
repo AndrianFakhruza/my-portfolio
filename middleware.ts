@@ -26,6 +26,7 @@ export async function middleware(request: NextRequest) {
     } catch {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("from", pathname);
+      loginUrl.searchParams.set("reason", "expired");
       const response = NextResponse.redirect(loginUrl);
       response.cookies.delete(TOKEN_COOKIE_NAME);
       return response;

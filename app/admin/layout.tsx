@@ -2,7 +2,8 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useState, useEffect, useCallback } from "react";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -30,42 +31,110 @@ const NAV_ITEMS = [
   { name: "Pesan Masuk", href: "/admin/messages", icon: Mail, desc: "Kontak & pesan" },
 ];
 
+// Batas waktu tidak aktif (inaktivitas): 30 Menit
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const handleLogout = useCallback(
+    async (reason?: string) => {
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("admin_last_activity");
+        }
+        await fetch("/api/auth/logout", { method: "POST" });
+        const target = reason ? `/admin/login?reason=${reason}` : "/admin/login";
+        router.push(target);
+        router.refresh();
+      } catch (e) {
+        console.error("Logout error", e);
+      }
+    },
+    [router]
+  );
+
+  // Inactivity tracking (Auto-logout jika tidak ada aktivitas selama 30 menit)
+  useEffect(() => {
+    if (pathname === "/admin/login") return;
+
+    const updateActivity = () => {
+      localStorage.setItem("admin_last_activity", Date.now().toString());
+    };
+
+    if (!localStorage.getItem("admin_last_activity")) {
+      updateActivity();
+    }
+
+    const checkInactivity = () => {
+      const last = localStorage.getItem("admin_last_activity");
+      if (last) {
+        const elapsed = Date.now() - parseInt(last, 10);
+        if (elapsed > INACTIVITY_TIMEOUT_MS) {
+          handleLogout("inactive");
+        }
+      }
+    };
+
+    const events = ["mousedown", "keydown", "scroll", "touchstart"];
+    const handleUserActivity = () => {
+      updateActivity();
+    };
+
+    events.forEach((evt) =>
+      window.addEventListener(evt, handleUserActivity, { passive: true })
+    );
+
+    // Cek berkala setiap 15 detik
+    const interval = setInterval(checkInactivity, 15000);
+
+    // Cek juga saat tab aktif kembali
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        checkInactivity();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", checkInactivity);
+
+    return () => {
+      events.forEach((evt) =>
+        window.removeEventListener(evt, handleUserActivity)
+      );
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", checkInactivity);
+    };
+  }, [pathname, handleLogout]);
+
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/admin/login");
-      router.refresh();
-    } catch (e) {
-      console.error("Logout error", e);
-    }
-  };
 
   const currentPage = NAV_ITEMS.find((item) =>
     item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href)
   );
 
   return (
-    <div className="min-h-screen flex bg-[#F8F8F8] dark:bg-[#18181B] text-[#18181B] dark:text-[#F8F8F8]">
-
-      {/* ─── Sidebar Desktop ─── */}
-      <aside className="hidden lg:flex w-60 flex-col flex-shrink-0 bg-white dark:bg-[#18181B] border-r border-[#E4E4E7] dark:border-[#27272A]">
-
-        {/* Logo */}
-        <div className="h-16 flex items-center gap-3 px-5 border-b border-[#E4E4E7] dark:border-[#27272A]">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-md shadow-amber-500/25">
-            <span className="text-[#18181B] font-black text-sm font-display">A</span>
+    <div className="h-screen w-screen flex overflow-hidden bg-[#F8F8F8] dark:bg-[#18181B] text-[#18181B] dark:text-[#F8F8F8]">
+      {/* ─── Sidebar Desktop (Fixed, Tidak ikut scroll halaman) ─── */}
+      <aside className="hidden lg:flex w-60 flex-col flex-shrink-0 h-full bg-white dark:bg-[#18181B] border-r border-[#E4E4E7] dark:border-[#27272A] z-20">
+        {/* Logo & Profil Brand */}
+        <div className="h-16 flex items-center gap-3 px-5 border-b border-[#E4E4E7] dark:border-[#27272A] flex-shrink-0">
+          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-amber-500/40 shadow-sm shadow-amber-500/20 flex-shrink-0">
+            <Image
+              src="/profile.jpg"
+              alt="Andrian Fakhruza"
+              fill
+              sizes="32px"
+              className="object-cover"
+              priority
+            />
           </div>
-          <div>
-            <p className="font-display font-bold text-sm tracking-tight text-[#18181B] dark:text-[#F8F8F8]">
+          <div className="min-w-0">
+            <p className="font-display font-bold text-sm tracking-tight text-[#18181B] dark:text-[#F8F8F8] truncate">
               Andrian Fakhruza
             </p>
             <p className="text-[10px] text-paper-400 dark:text-paper-500 font-medium">
@@ -74,8 +143,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
+        {/* Navigasi (Dapat di-scroll internal jika layar pendek) */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           <p className="px-3 mb-3 text-[10px] font-semibold uppercase tracking-widest text-paper-400 dark:text-paper-500">
             Menu
           </p>
@@ -97,23 +166,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     : "text-paper-600 dark:text-paper-400 hover:bg-paper-100 dark:hover:bg-[#27272A] hover:text-[#18181B] dark:hover:text-[#F8F8F8]"
                 )}
               >
-                <span className={cn(
-                  "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
-                  isActive
-                    ? "bg-amber-500/20 text-amber-600 dark:text-[#F59E0B]"
-                    : "bg-paper-100 dark:bg-[#27272A] text-paper-500 dark:text-paper-400 group-hover:bg-paper-200 dark:group-hover:bg-[#3F3F46]"
-                )}>
+                <span
+                  className={cn(
+                    "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
+                    isActive
+                      ? "bg-amber-500/20 text-amber-600 dark:text-[#F59E0B]"
+                      : "bg-paper-100 dark:bg-[#27272A] text-paper-500 dark:text-paper-400 group-hover:bg-paper-200 dark:group-hover:bg-[#3F3F46]"
+                  )}
+                >
                   <Icon className="w-4 h-4" />
                 </span>
                 <span className="flex-1">{item.name}</span>
-                {isActive && <ChevronRight className="w-3.5 h-3.5 opacity-60 text-[#F59E0B]" />}
+                {isActive && (
+                  <ChevronRight className="w-3.5 h-3.5 opacity-60 text-[#F59E0B]" />
+                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Bottom */}
-        <div className="p-3 border-t border-[#E4E4E7] dark:border-[#27272A] space-y-1">
+        {/* Bagian Bawah (Logout & Live site) */}
+        <div className="p-3 border-t border-[#E4E4E7] dark:border-[#27272A] space-y-1 flex-shrink-0">
           <Link
             href="/"
             target="_blank"
@@ -126,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => handleLogout()}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer group"
           >
             <span className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center flex-shrink-0">
@@ -137,10 +210,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* ─── Main Area ─── */}
-      <div className="flex-1 flex flex-col min-w-0">
-
-        {/* Top bar */}
+      {/* ─── Main Content Area (Scroll internal mandiri) ─── */}
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        {/* Top bar (Fixed di atas konten) */}
         <header className="h-16 flex-shrink-0 bg-white/80 dark:bg-[#18181B]/80 backdrop-blur-md border-b border-[#E4E4E7] dark:border-[#27272A] px-5 flex items-center justify-between z-10">
           <div className="flex items-center gap-4">
             {/* Mobile hamburger */}
@@ -167,7 +239,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             <Link
               href="/"
@@ -177,16 +249,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Live Site
               <ExternalLink className="w-3 h-3" />
             </Link>
-            {/* Avatar */}
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-md shadow-amber-500/20 ml-1">
-              <span className="text-[#18181B] text-xs font-bold font-display">A</span>
+
+            {/* Avatar Profil Foto User */}
+            <div className="relative w-8 h-8 rounded-full overflow-hidden border border-paper-200 dark:border-paper-700 shadow-sm flex-shrink-0" title="Andrian Fakhruza">
+              <Image
+                src="/profile.jpg"
+                alt="Andrian Fakhruza"
+                fill
+                sizes="32px"
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
         </header>
 
         {/* Mobile drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white dark:bg-[#18181B] border-b border-[#E4E4E7] dark:border-[#27272A] p-3 space-y-0.5 shadow-lg">
+          <div className="lg:hidden bg-white dark:bg-[#18181B] border-b border-[#E4E4E7] dark:border-[#27272A] p-3 space-y-0.5 shadow-lg flex-shrink-0">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -213,7 +293,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="pt-2 border-t border-[#E4E4E7] dark:border-[#27272A]">
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={() => handleLogout()}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
@@ -223,9 +303,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         )}
 
-        {/* Page Content */}
-        <main className="flex-1 p-5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          {children}
+        {/* Area Konten Utama (Scrollable secara mandiri) */}
+        <main className="flex-1 overflow-y-auto p-5 sm:p-6 lg:p-8">
+          <div className="max-w-7xl w-full mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
