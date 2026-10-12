@@ -38,6 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = useCallback(
     async (reason?: string) => {
@@ -199,7 +200,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
           <button
             type="button"
-            onClick={() => handleLogout()}
+            onClick={() => setShowLogoutModal(true)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer group"
           >
             <span className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center flex-shrink-0">
@@ -293,7 +294,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="pt-2 border-t border-[#E4E4E7] dark:border-[#27272A]">
               <button
                 type="button"
-                onClick={() => handleLogout()}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setShowLogoutModal(true);
+                }}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
@@ -310,6 +314,56 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </main>
       </div>
+
+      {/* ─── Modal Konfirmasi Keluar ─── */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div
+            className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#1f1f23] border border-paper-200 dark:border-paper-800 p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150"
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0">
+                <LogOut className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-base text-paper-900 dark:text-paper-100">
+                  Konfirmasi Keluar
+                </h3>
+                <p className="text-xs text-paper-500 dark:text-paper-400">
+                  Panel Administrator
+                </p>
+              </div>
+            </div>
+
+            <p className="text-sm text-paper-600 dark:text-paper-300 leading-relaxed">
+              Apakah Anda yakin ingin keluar dari panel admin? Anda harus memasukkan kredensial lagi untuk login kembali.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 text-xs font-semibold rounded-xl border border-paper-200 dark:border-paper-700 text-paper-700 dark:text-paper-300 hover:bg-paper-100 dark:hover:bg-paper-800 transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLogoutModal(false);
+                  handleLogout();
+                }}
+                className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/25 transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

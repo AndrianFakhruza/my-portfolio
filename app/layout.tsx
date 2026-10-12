@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Roboto_Slab } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TopProgressBar } from "@/components/top-progress-bar";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -67,6 +68,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
         >
+          <TopProgressBar />
           {children}
         </ThemeProvider>
       </body>
