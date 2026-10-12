@@ -7,71 +7,48 @@ export interface TechItem {
 
 export const TECH_ROW_1: TechItem[] = [
   {
-    name: "Flutter",
+    name: "TypeScript",
     icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Flutter">
-        <path fill="#42A5F5" d="M78.6 0L14.4 64.2l19.6 19.6L117.8 0H78.6z" />
-        <path fill="#42A5F5" d="M78.6 49.1L39.3 88.4l19.6 19.6 39.3-39.3h19.6L78.6 49.1z" />
-        <path fill="#01579B" d="M78.6 88.4l19.6 19.6H59l-19.7-19.6 19.7-19.6 19.6 19.6z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Next.js",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Next.js">
-        <circle cx="64" cy="64" r="64" fill="#000000" />
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="TypeScript">
+        <rect width="128" height="128" rx="16" fill="#3178C6" />
         <path
-          d="M87.5 96.2L49.1 46.8H40v34.4h6.7V56.5l34.7 44.8c2.1-1.6 4.1-3.3 6-5.1z"
-          fill="url(#next-gradient)"
-        />
-        <defs>
-          <linearGradient id="next-gradient" x1="56" y1="46" x2="84" y2="92" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#FFFFFF" />
-            <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <rect x="80.6" y="46.8" width="6.7" height="34.4" fill="#FFFFFF" />
-      </svg>
-    ),
-  },
-  {
-    name: "CodeIgniter",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="CodeIgniter">
-        <path
-          d="M60.8 7.3c2.7 6.3 2.1 13.9-.8 19.8-3.9 7.9-10.7 13.9-15.6 21.6-9.1 14.3-9.5 32.8-1 47.3 12.3 20.9 39.5 28.5 60.5 16.9 21-11.6 29.6-37.4 19.3-58.8-3.1-6.4-7.9-11.8-13.6-16-1.9 6.8-5.6 13.1-10.8 17.8-2 1.8-4.4 3.3-7 4.1 1.7-4.2 2.4-8.8 2-13.3-.6-6.8-3.8-13.2-8.6-18-5.4-5.4-12.4-9.1-19.4-12.7-2.1-1.1-4-2.3-5-8.7z"
-          fill="#EE4326"
-        />
-        <path
-          d="M50.4 46.8c-3.1 5.9-4.8 12.6-4.9 19.3 0 12.7 6.7 24.6 17.6 31.3 10.9 6.7 24.6 6.8 35.6.3 3.6-2.1 6.8-4.9 9.3-8.2-1.9 1.4-3.9 2.6-6.1 3.5-10.4 4.3-22.5 2.1-30.8-5.4-8.3-7.5-11.4-19.3-7.8-29.8 1.4-4.2 3.8-8 6.9-11.1-2.9-2.9-6-5.8-9.8-7.9 3.3 2.6 6.2 5.5 8.7 8.8-3.2-.2-6.5-.4-9.5-.8z"
-          fill="#F39C12"
+          d="M72.2 47.9h39.9v10.9H98.4v48.6H86.2V58.8H72.2V47.9zm-46.7 34.6c2.5 3.9 6 6.3 11 6.3 5.4 0 8.9-2.8 8.9-7 0-4.8-4.2-6.5-10.7-9.3-8.8-3.7-14.7-7.8-14.7-16.7 0-8.9 7.2-15.6 18.2-15.6 7.4 0 12.9 2.5 16.6 8.3l-8.6 5.5c-2.3-3.2-5-4.7-8.3-4.7-4.3 0-7.1 2.5-7.1 5.9 0 3.9 3.5 5.4 9.8 8.1 9.7 4.1 15.7 8.3 15.7 17.5 0 10.3-8.1 16.7-19.8 16.7-9.5 0-16.3-3.7-20.1-10.3l9.5-6.7z"
+          fill="#FFFFFF"
         />
       </svg>
     ),
   },
   {
-    name: "React",
+    name: "JavaScript",
     icon: (
-      <svg viewBox="-11.5 -10.232 23 20.463" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="React">
-        <circle cx="0" cy="0" r="2.05" fill="#61dafb" />
-        <g stroke="#61dafb" strokeWidth="1" fill="none">
-          <ellipse rx="11" ry="4.2" />
-          <ellipse rx="11" ry="4.2" transform="rotate(60)" />
-          <ellipse rx="11" ry="4.2" transform="rotate(120)" />
-        </g>
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="JavaScript">
+        <rect width="128" height="128" rx="16" fill="#F7DF1E" />
+        <path
+          d="M67.8 88.5c1.8 3.1 4.2 5.3 8.6 5.3 4.4 0 7.2-2.2 7.2-5.3 0-3.6-2.9-4.9-7.7-7-6.9-3-11.4-6.8-11.4-15.1 0-7.5 5.8-13.2 14.8-13.2 6.4 0 11 2.5 14.1 7.9l-6.9 4.4c-1.5-2.6-3.6-3.8-7.2-3.8-3.4 0-5.6 2.1-5.6 4.7 0 3.3 2.2 4.6 7.4 6.8 8.1 3.5 11.9 7.3 11.9 15.6 0 8.9-6.9 13.9-16.7 13.9-9.3 0-15.4-4.5-17.7-10.7l9.2-5.5zm-33.8 1.4c1.3 2.2 2.7 4.1 5.8 4.1 3 0 4.9-1.3 4.9-6.3V53.8h11.2v33.7c0 10.7-6.3 15.4-15.5 15.4-8.3 0-13.1-4.3-15.5-9.8l9.1-5.2z"
+          fill="#000000"
+        />
       </svg>
     ),
   },
   {
-    name: "Dart",
+    name: "HTML",
     icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Dart">
-        <path fill="#01579B" d="M26.4 10.5L10.5 26.4l43.2 43.2 33.6-17.6z" />
-        <path fill="#00B0FF" d="M10.5 26.4v75.2l26.4 15.9 50.4-50.4z" />
-        <path fill="#0081CB" d="M87.3 67.1l-50.4 50.4h64.7L117.5 102z" />
-        <path fill="#40C4FF" d="M26.4 10.5h64.7l26.4 15.9-43.2 43.2z" />
-        <path fill="#0091EA" d="M117.5 26.4v75.6l-15.9 15.5L67.1 82.8z" />
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="HTML5">
+        <path fill="#E44D26" d="M19.3 113.8L8.6 0h110.8l-10.7 113.8L63.8 128" />
+        <path fill="#F16529" d="M64 117.4l38.2-10.6 9-95.8H64" />
+        <path fill="#EBEBEB" d="M64 51.5H46.1l-1.2-13.9H64V24.5H31.1l3.7 40.2H64zm0 37.9l-.2.1-16.1-4.3-1-11.5H33.4l2 22.8 28.4 7.9.2-.1" />
+        <path fill="#FFF" d="M63.9 64.7H80l-1.5 17-14.6 3.9v13.5l26.8-7.4 2.8-31.2.4-4.2.4-4.6.9-9.8.9-10.4.9-10.4H63.9v13.1h32.1l-.3 3.9-.9 9.8z" />
+      </svg>
+    ),
+  },
+  {
+    name: "CSS",
+    icon: (
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="CSS3">
+        <path fill="#1572B6" d="M19.3 113.8L8.6 0h110.8l-10.7 113.8L63.8 128" />
+        <path fill="#33A9DC" d="M64 117.4l38.2-10.6 9-95.8H64" />
+        <path fill="#EBEBEB" d="M64 51.5H46.1l-1.2-13.9H64V24.5H31.1l3.7 40.2H64zm0 37.9l-.2.1-16.1-4.3-1-11.5H33.4l2 22.8 28.4 7.9.2-.1" />
+        <path fill="#FFF" d="M63.9 64.7H80l-1.5 17-14.6 3.9v13.5l26.8-7.4 2.8-31.2.4-4.2.4-4.6.9-9.8.9-10.4.9-10.4H63.9v13.1h32.1l-.3 3.9-.9 9.8z" />
       </svg>
     ),
   },
@@ -97,6 +74,51 @@ export const TECH_ROW_1: TechItem[] = [
 
 export const TECH_ROW_2: TechItem[] = [
   {
+    name: "Python",
+    icon: (
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Python">
+        <path
+          fill="#3776AB"
+          d="M63.7 3.3c-23.8 0-22.3 10.3-22.3 10.3l.03 10.7h22.7v3.2H32.6s-14.7 1.7-14.7 22.8c0 21.2 12.8 20.4 12.8 20.4h7.7v-10.8s-.4-12.8 12.6-12.8h21.9s12.2.2 12.2-11.9V15.7S86.8 3.3 63.7 3.3zm-12.5 6.9c2.4 0 4.4 2 4.4 4.4 0 2.4-2 4.4-4.4 4.4-2.4 0-4.4-2-4.4-4.4 0-2.4 2-4.4 4.4-4.4z"
+        />
+        <path
+          fill="#FFD43B"
+          d="M64.3 124.7c23.8 0 22.3-10.3 22.3-10.3l-.03-10.7H63.9v-3.2h31.5s14.7-1.7 14.7-22.8c0-21.2-12.8-20.4-12.8-20.4h-7.7v10.8s.4 12.8-12.6 12.8H55.1s-12.2-.2-12.2 11.9v21.8s-1.7 12.4 21.4 12.4zm12.5-6.9c-2.4 0-4.4-2-4.4-4.4 0-2.4 2-4.4 4.4-4.4 2.4 0 4.4 2 4.4 4.4 0 2.4-2 4.4-4.4 4.4z"
+        />
+      </svg>
+    ),
+  },
+  {
+    name: "Java",
+    icon: (
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Java">
+        <path fill="#EA2D2E" d="M46.7 93.8s-6.3 3.5 4.5 4.8c13 1.5 19.8 1.4 34.3-.8 0 0 3.7 2.3 8.8 4.2-32.5 13.9-63.5-1.5-47.6-8.2zM43.3 81.3s-7.2 4.7 3.8 6.1c13.7 1.7 24.3 1.9 42.4-.9 0 0 2.6 2.4 6.2 3.8-38.3 11.2-68.5.8-52.4-9z" />
+        <path fill="#5382A1" d="M69.8 62.4c4.6 5.3-1.2 10.1-1.2 10.1s11.5-6 6.3-13.3c-5.1-7.1-9.5-10.6 12.8-22.3 0 0-29.3 7.5-17.9 25.5zm19.6 21.6c11.7-8.3 6.3-16.2 2.5-15-1.5.5-2.2 1-2.2 1s.7-.9 2-1.4c8-3.4 14.1 8.8-2.3 15.4z" />
+        <path fill="#EA2D2E" d="M60.1 113.6c20.3 1.3 41.5-1 42.4-1.5 0 0-3.8 3.1-9.8 5.4-23.7 4.1-51.2 2.8-63.1-2.6 0 0 2.9 2 9.2 2.4-12.8 4.4-36.9 1-36.9 1s4.8 2.6 13.4 3.7c15.4 1.9 33.3 2 48.9.3 19.5-2.1 36.5-7.7 36.5-7.7s-3.5 2.5-10.2 4.4c-19.1 5.3-51.7 4.7-68.8.8 0 0 22.8 1.9 38.4-6.2z" />
+      </svg>
+    ),
+  },
+  {
+    name: "MySQL",
+    icon: (
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="MySQL">
+        <path fill="#00758F" d="M62.6 27.6c-4.7 0-9.2 1.3-13.2 3.7-2.3-3.6-5.8-6.3-10-7.8-1.5-.5-3.1-.8-4.7-.8-8.5 0-15.4 6.9-15.4 15.4 0 1.2.1 2.3.4 3.4-6.8 6.7-10.8 16-10.8 26.2 0 19.8 15.2 36 34.6 37.6 1.7.1 3.4.2 5.1.2 13.3 0 25.1-6.9 31.9-17.4 3.3 1.9 7.2 3 11.2 3 12.5 0 22.6-10.1 22.6-22.6 0-11.8-9-21.5-20.6-22.5-3.1-11.9-13.8-20.8-26.6-20.8zm0 7c8.8 0 16.3 5.8 18.9 13.9-3.7.8-7 2.7-9.5 5.3-2.6-2.1-5.9-3.3-9.4-3.3-8.5 0-15.4 6.9-15.4 15.4 0 1.8.3 3.6.9 5.2-1.7.3-3.4.5-5.1.5-15.7 0-28.5-12.8-28.5-28.5 0-7.7 3-14.7 7.9-19.9 2 4.4 6.2 7.6 11.3 8.1 4.7.5 9.4-1.2 12.8-4.5 2.1 3.4 5.9 5.8 10.2 6.5 1.9.3 3.8.2 5.6-.4-1.3-4.2.8-8.8 4.7-10.8 1.8-.9 3.8-1.5 5.6-1.5z" />
+        <path fill="#F29111" d="M89.3 71.2c-5.8 0-10.5-4.7-10.5-10.5s4.7-10.5 10.5-10.5 10.5 4.7 10.5 10.5-4.7 10.5-10.5 10.5z" />
+      </svg>
+    ),
+  },
+  {
+    name: "PostgreSQL",
+    icon: (
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="PostgreSQL">
+        <path
+          fill="#336791"
+          d="M63.5 10.6c-27.9 0-40.4 17.5-44.5 28.9-6.3 17.4-4.2 38.6 3.1 55.4 6.8 15.6 20.7 24.3 37.6 24.3 1.2 0 2.5-.1 3.7-.2 1.3.1 2.5.2 3.8.2 16.9 0 30.8-8.7 37.6-24.3 7.3-16.8 9.4-38 3.1-55.4-4.1-11.4-16.6-28.9-44.4-28.9zm0 8.2c22.5 0 33.1 13.9 36.6 23.7 5.5 15.2 3.6 34.2-2.7 48.7-5.3 12.2-16 19.3-30.1 19.8 1.4-3.5 2.5-7.3 3.3-11.2 5.1-.9 9.6-3.7 12.3-8 1.2-1.9 1.9-4.2 2-6.5-1.7.3-3.4.4-5.1.2-1.6 2.4-4.1 4.2-7.1 4.9.4-3.6.5-7.3.3-10.9 6.2-1.8 11.2-6.1 13.4-12.1.8-2.2 1-4.7.6-7-1.8.8-3.7 1.3-5.7 1.5-1.3 3.8-4.2 6.8-8.1 8.1-.5-4.4-1.6-8.7-3.4-12.8 5-3.8 8.4-9.5 9-15.8.2-2.1-.1-4.3-.9-6.3-1.6 1.4-3.4 2.5-5.4 3.2-1.1 5.3-4.8 9.5-9.8 10.9-.9-1.2-1.9-2.3-3-3.3-1.1 1-2.1 2.1-3 3.3-5-1.4-8.7-5.6-9.8-10.9-2-.7-3.8-1.8-5.4-3.2-.8 2-1.1 4.2-.9 6.3.6 6.3 4 12 9 15.8-1.8 4.1-2.9 8.4-3.4 12.8-3.9-1.3-6.8-4.3-8.1-8.1-2-.2-3.9-.7-5.7-1.5-.4 2.3-.2 4.8.6 7 2.2 6 7.2 10.3 13.4 12.1-.2 3.6-.1 7.3.3 10.9-3-.7-5.5-2.5-7.1-4.9-1.7.2-3.4.1-5.1-.2.1 2.3.8 4.6 2 6.5 2.7 4.3 7.2 7.1 12.3 8 .8 3.9 1.9 7.7 3.3 11.2-14.1-.5-24.8-7.6-30.1-19.8-6.3-14.5-8.2-33.5-2.7-48.7 3.5-9.8 14.1-23.7 36.6-23.7z"
+        />
+      </svg>
+    ),
+  },
+  {
     name: "Figma",
     icon: (
       <svg viewBox="0 0 38 57" className="w-7 h-10 sm:w-8 sm:h-11 shrink-0 drop-shadow-xs" fill="none" aria-label="Figma">
@@ -109,65 +131,17 @@ export const TECH_ROW_2: TechItem[] = [
     ),
   },
   {
-    name: "Photoshop",
+    name: "Jupyter",
     icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-2xl overflow-hidden drop-shadow-xs" aria-label="Adobe Photoshop">
-        <rect width="128" height="128" rx="26" fill="#001E36" />
-        <text x="40" y="86" fill="#31A8FF" fontSize="52" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">P</text>
-        <text x="86" y="86" fill="#31A8FF" fontSize="48" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">s</text>
-      </svg>
-    ),
-  },
-  {
-    name: "Premiere Pro",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-2xl overflow-hidden drop-shadow-xs" aria-label="Adobe Premiere Pro">
-        <rect width="128" height="128" rx="26" fill="#00005B" />
-        <text x="40" y="86" fill="#9999FF" fontSize="52" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">P</text>
-        <text x="86" y="86" fill="#9999FF" fontSize="48" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">r</text>
-      </svg>
-    ),
-  },
-  {
-    name: "Blender",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Blender">
-        <path fill="#EA7600" d="M85.7 60.3c15.2-1.9 27.2 9.5 27.2 24.7 0 14.1-11.5 25.6-25.6 25.6-13.6 0-24.7-10.7-25.5-24.1L8.7 58.7c-2.4-1.9-2.8-5.4-.9-7.8l5-6.3c1.9-2.4 5.4-2.8 7.8-.9l35.8 28.5L85.7 60.3z" />
-        <circle cx="87.3" cy="85" r="14.5" fill="#225796" />
-        <circle cx="87.3" cy="85" r="7.5" fill="#FFFFFF" />
-        <path fill="#EA7600" d="M79.2 46.5c-2.8-1.2-4.1-4.4-2.9-7.2l8.8-20.5c1.2-2.8 4.4-4.1 7.2-2.9l7.4 3.2c2.8 1.2 4.1 4.4 2.9 7.2l-8.8 20.5c-1.2 2.8-4.4 4.1-7.2 2.9l-7.4-3.2zM45.5 48.7c1.2-2.8 4.4-4.1 7.2-2.9l20.5 8.8c2.8 1.2 4.1 4.4 2.9 7.2l-3.2 7.4c-1.2 2.8-4.4 4.1-7.2 2.9l-20.5-8.8c-2.8-1.2-4.1-4.4-2.9-7.2l3.2-7.4z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Android Studio",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Android Studio">
-        <circle cx="64" cy="64" r="56" fill="#F4F4F6" stroke="#D1D5DB" strokeWidth="2" />
-        <path d="M44 86l20-56 20 56-8 4-12-32-12 32z" fill="#4285F4" />
-        <circle cx="64" cy="38" r="7" fill="#4285F4" />
-        <circle cx="78" cy="74" r="10" fill="#3DDC84" />
-        <circle cx="75" cy="72" r="1.5" fill="#FFFFFF" />
-        <circle cx="81" cy="72" r="1.5" fill="#FFFFFF" />
-      </svg>
-    ),
-  },
-  {
-    name: "Canva",
-    icon: (
-      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-2xl overflow-hidden drop-shadow-xs" aria-label="Canva">
-        <defs>
-          <linearGradient id="canva-grad-2" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#00C4CC" />
-            <stop offset="100%" stopColor="#7D2AE8" />
-          </linearGradient>
-        </defs>
-        <rect width="128" height="128" rx="28" fill="url(#canva-grad-2)" />
-        <text x="64" y="78" fill="#FFFFFF" fontSize="38" fontStyle="italic" fontWeight="bold" textAnchor="middle" fontFamily="'Brush Script MT', cursive, sans-serif">Canva</text>
+      <svg viewBox="0 0 128 128" className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 drop-shadow-xs" aria-label="Jupyter">
+        <path fill="#F37626" d="M64 23.3c-28.5 0-51.7 11.2-51.7 25 0 8.9 9.6 16.7 24.3 21-1.3-3.2-2-6.6-2-10.1 0-17 13.2-30.8 29.4-30.8 16.3 0 29.4 13.8 29.4 30.8 0 3.5-.7 6.9-2 10.1 14.7-4.3 24.3-12.1 24.3-21 0-13.8-23.2-25-51.7-25z" />
+        <path fill="#767677" d="M64 104.7c28.5 0 51.7-11.2 51.7-25 0-8.9-9.6-16.7-24.3-21 1.3 3.2 2 6.6 2 10.1 0 17-13.2 30.8-29.4 30.8-16.3 0-29.4-13.8-29.4-30.8 0-3.5.7-6.9 2-10.1-14.7 4.3-24.3 12.1-24.3 21 0 13.8 23.2 25 51.7 25z" />
+        <circle cx="34" cy="18" r="4.5" fill="#6E6E6E" />
+        <circle cx="94" cy="110" r="4.5" fill="#F37626" />
+        <circle cx="98" cy="22" r="3.2" fill="#F37626" />
       </svg>
     ),
   },
 ];
 
-// Combine both rows for other uses if needed
 export const TECH_STACK = [...TECH_ROW_1, ...TECH_ROW_2];
