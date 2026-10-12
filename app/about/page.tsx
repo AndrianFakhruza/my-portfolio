@@ -5,12 +5,9 @@ import {
   Download,
   ArrowUpRight,
   CheckCircle2,
-  GraduationCap,
   Users2,
   Briefcase,
   Sparkles,
-  Award,
-  Layers,
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -34,61 +31,98 @@ export default async function AboutPage() {
   ]);
 
   // Fallback defaults if DB is temporarily empty
-  const displayEducations = educations.length > 0 ? educations : [
-    {
-      id: "edu-1",
-      institution: "Politeknik Negeri Lhokseumawe",
-      degree: "Sarjana Terapan Teknik Informatika",
-      period: "Agustus 2022 – Agustus 2026",
-      score: "IPK: 3,67 / 4,00",
-      description: "Fokus pada rekayasa perangkat lunak, pemrograman web modern, struktur data, pengolahan basis data, dan kecerdasan buatan.",
-    },
-    {
-      id: "edu-2",
-      institution: "SMA Negeri Modal Bangsa Arun",
-      degree: "MIPA / Sekolah Unggulan",
-      period: "Juli 2019 – Mei 2022",
-      score: "Nilai Akhir: 93,62",
-      description: "Aktif dalam organisasi kepemimpinan sekolah dan pengembangan potensi akademik sains & teknologi.",
-    },
+  const displayEducations =
+    educations.length > 0
+      ? educations
+      : [
+          {
+            id: "edu-1",
+            institution: "Politeknik Negeri Lhokseumawe",
+            degree: "Teknik Informatika",
+            period: "2022 - SEKARANG",
+            score: "IPK: 3.67 / 4.00",
+            description: "",
+          },
+          {
+            id: "edu-2",
+            institution: "SMA Negeri Modal Bangsa Arun",
+            degree: "MIPA / Sekolah Unggulan",
+            period: "2019 - 2022",
+            score: "Nilai Akhir: 93.62",
+            description: "",
+          },
+        ];
+
+  const displayOrganizations =
+    organizations.length > 0
+      ? organizations
+      : [
+          {
+            id: "org-1",
+            role: "Ketua Bagian Perlengkapan dan Dekorasi",
+            organization: "Pormatik (Pekan Olahraga & Seni Mahasiswa Informatika)",
+            period: "2023",
+            description:
+              "• Merencanakan dan mengatur segala kebutuhan perlengkapan dan dekorasi untuk acara, termasuk pemilihan tema dan pengadaan peralatan.\n• Mengelola anggaran yang dialokasikan untuk perlengkapan dan dekorasi.\n• Memimpin dan mengkoordinasi tim dalam persiapan dan pelaksanaan dekorasi serta perlengkapan acara.",
+          },
+          {
+            id: "org-2",
+            role: "Ketua Palang Merah Remaja",
+            organization: "SMA Negeri Modal Bangsa Arun",
+            period: "2021 – 2022",
+            description:
+              "• Memimpin dan mengelola organisasi PMR, termasuk pembagian tugas dan pelatihan anggota.\n• Mengawasi pelaksanaan kegiatan dan memberikan pertolongan saat diperlukan di berbagai acara sekolah.\n• Menginisiasi latihan bersama dengan sekolah lain untuk bertukar pengalaman dan mempererat hubungan antar sekolah.",
+          },
+          {
+            id: "org-3",
+            role: "Anggota Divisi DigiHub",
+            organization: "Komunitas Mahasiswa IT (Komit) PNL",
+            period: "2024 – Sekarang",
+            description:
+              "• Bertanggung jawab dalam menyusun caption kreatif dan informatif untuk setiap konten yang dipublikasikan di media sosial komunitas.\n• Aktif terlibat dalam seluruh kegiatan Komit, baik sebagai peserta maupun tim pelaksana.",
+          },
+        ];
+
+  const defaultHardSkills = [
+    "Python",
+    "Figma",
+    "Editing Video",
+    "Content Creation",
+    "Microsoft Office",
+    "Next.js & React",
+    "TypeScript & JavaScript",
+    "Tailwind CSS",
   ];
 
-  const displayOrganizations = organizations.length > 0 ? organizations : [
-    {
-      id: "org-1",
-      role: "Ketua Bagian Perlengkapan dan Dekorasi",
-      organization: "Pormatik (Pekan Olahraga & Seni Mahasiswa Informatika)",
-      period: "2023",
-      description: "• Merencanakan dan mengatur segala kebutuhan perlengkapan dan dekorasi untuk acara, termasuk pemilihan tema dan pengadaan peralatan.\n• Mengelola anggaran yang dialokasikan untuk perlengkapan dan dekorasi.\n• Memimpin dan mengkoordinasi tim dalam persiapan dan pelaksanaan dekorasi serta perlengkapan acara.",
-    },
-    {
-      id: "org-2",
-      role: "Ketua Palang Merah Remaja",
-      organization: "SMA Negeri Modal Bangsa Arun",
-      period: "2021 – 2022",
-      description: "• Memimpin dan mengelola organisasi PMR, termasuk pembagian tugas dan pelatihan anggota.\n• Mengawasi pelaksanaan kegiatan dan memberikan pertolongan saat diperlukan di berbagai acara sekolah.\n• Menginisiasi latihan bersama dengan sekolah lain untuk bertukar pengalaman dan mempererat hubungan antar sekolah.",
-    },
-    {
-      id: "org-3",
-      role: "Anggota Divisi DigiHub",
-      organization: "Komunitas Mahasiswa IT (Komit) PNL",
-      period: "2024 – Sekarang",
-      description: "• Bertanggung jawab dalam menyusun caption kreatif dan informatif untuk setiap konten yang dipublikasikan di media sosial komunitas.\n• Aktif terlibat dalam seluruh kegiatan Komit, baik sebagai peserta maupun tim pelaksana.",
-    },
+  const defaultSoftSkills = [
+    "Manajemen Waktu",
+    "Kemampuan Berkomunikasi",
+    "Disiplin dan Bertanggung Jawab",
+    "Kemampuan Berkolaborasi",
+    "Kemampuan Berorganisasi",
+    "Problem Solving",
   ];
 
-  const displayCapabilities = capabilities.length > 0 ? capabilities : [
-    {
-      id: "cap-1",
-      title: "Hard Skills & Alat Teknis",
-      skills: "Python\nFigma & UI/UX Design\nNext.js 15 & React\nTypeScript & JavaScript\nTailwind CSS\nEditing Video\nContent Creation\nMicrosoft Office\nREST API & Prisma ORM\nGit & Version Control",
-    },
-    {
-      id: "cap-2",
-      title: "Soft Skills & Karakter Kerja",
-      skills: "Manajemen Waktu\nKemampuan Berkomunikasi\nDisiplin dan Bertanggung Jawab\nKemampuan Berkolaborasi\nKemampuan Berorganisasi\nProblem Solving & Berpikir Kritis\nAdaptabilitas & Kemauan Belajar",
-    },
-  ];
+  // Separate capabilities into hard and soft if available
+  const hardCap = capabilities.find(
+    (c) =>
+      c.title.toLowerCase().includes("hard") ||
+      c.title.toLowerCase().includes("alat") ||
+      c.title.toLowerCase().includes("teknis")
+  );
+  const softCap = capabilities.find(
+    (c) =>
+      c.title.toLowerCase().includes("soft") ||
+      c.title.toLowerCase().includes("kolaborasi")
+  );
+
+  const hardSkillsList = hardCap
+    ? hardCap.skills.split("\n").map((s) => s.trim()).filter(Boolean)
+    : defaultHardSkills;
+
+  const softSkillsList = softCap
+    ? softCap.skills.split("\n").map((s) => s.trim()).filter(Boolean)
+    : defaultSoftSkills;
 
   return (
     <>
@@ -111,7 +145,8 @@ export default async function AboutPage() {
               </h1>
 
               <p className="text-base sm:text-lg text-paper-700 dark:text-paper-200 leading-relaxed font-normal">
-                {profile?.bio1 ?? "Saya merupakan mahasiswa Teknik Informatika di Politeknik Negeri Lhokseumawe dengan ketertarikan mendalam pada Web Development, UI/UX Design, Data Science, dan Machine Learning."}
+                {profile?.bio1 ??
+                  "Saya merupakan mahasiswa Teknik Informatika di Politeknik Negeri Lhokseumawe dengan ketertarikan mendalam pada Web Development, UI/UX Design, Data Science, dan Machine Learning."}
               </p>
 
               {profile?.bio2 && (
@@ -162,72 +197,131 @@ export default async function AboutPage() {
             </div>
           </div>
 
-          {/* ─── 1. Academic Path (Pendidikan) ─── */}
-          <section className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                  <GraduationCap className="w-4 h-4" />
-                  <span>Academic Path</span>
-                </div>
-                <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-paper-950 dark:text-paper-50">
-                  Riwayat Pendidikan
-                </h2>
+          {/* ─── TWO COLUMN: ACADEMIC PATH (Kiri) & KETERAMPILAN (Kanan) ─── */}
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+            {/* ── KOLOM KIRI: ACADEMIC PATH (TIMELINE STYLE) ── */}
+            <div className="lg:col-span-5 space-y-6">
+              {/* Header Title with Line */}
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold tracking-widest uppercase text-paper-400 dark:text-paper-500 font-mono">
+                  ACADEMIC PATH
+                </span>
+                <span className="h-[1.5px] w-12 bg-paper-300 dark:bg-paper-700 inline-block" />
               </div>
-              <p className="text-xs sm:text-sm text-paper-500 dark:text-paper-400 max-w-md">
-                Jejak akademis formal dan fokus studi yang membentuk fondasi keilmuan teknologi serta analisis.
-              </p>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-              {displayEducations.map((edu, idx) => (
-                <div
-                  key={edu.id || idx}
-                  className="relative p-5 sm:p-6 rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-white dark:bg-[#18181B] shadow-sm hover:shadow-md hover:border-amber-500/40 transition-all flex flex-col justify-between group"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-                        <GraduationCap className="w-5 h-5" />
-                      </div>
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-paper-100 dark:bg-paper-800 text-paper-600 dark:text-paper-300 border border-paper-200/60 dark:border-paper-700">
+              {/* Vertical Timeline */}
+              <div className="relative pl-7 space-y-9">
+                {/* Connecting Vertical Line */}
+                <div className="absolute left-[6px] top-3 bottom-3 w-[1.5px] bg-paper-200 dark:bg-paper-800" />
+
+                {displayEducations.map((edu, idx) => (
+                  <div key={edu.id || idx} className="relative group">
+                    {/* Hollow Circle Node */}
+                    <span className="absolute -left-[27px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-paper-900 dark:border-paper-100 bg-white dark:bg-[#18181B] group-hover:border-amber-500 transition-colors" />
+
+                    <div className="space-y-1.5">
+                      {/* Period */}
+                      <p className="text-xs font-semibold text-paper-500 dark:text-paper-400 uppercase tracking-wider">
                         {edu.period}
-                      </span>
-                    </div>
+                      </p>
 
-                    <div>
-                      <h3 className="font-display text-base sm:text-lg font-bold text-paper-950 dark:text-paper-50 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                      {/* Institution Name */}
+                      <h3 className="font-display text-lg sm:text-xl font-bold text-paper-950 dark:text-paper-50 leading-snug">
                         {edu.institution}
                       </h3>
-                      <p className="text-xs sm:text-sm font-semibold text-paper-700 dark:text-paper-300 mt-0.5">
+
+                      {/* Major / Degree */}
+                      <p className="text-sm font-medium text-paper-600 dark:text-paper-400">
                         {edu.degree}
                       </p>
-                    </div>
 
-                    {edu.description && (
-                      <p className="text-xs text-paper-500 dark:text-paper-400 leading-relaxed">
-                        {edu.description}
-                      </p>
-                    )}
+                      {/* Score Badge */}
+                      {edu.score && (
+                        <div className="pt-1.5">
+                          <span className="inline-block px-3 py-1 rounded-lg text-xs font-bold bg-paper-100 dark:bg-paper-800/90 text-paper-900 dark:text-paper-100 border border-paper-200/60 dark:border-paper-700/60 shadow-xs">
+                            {edu.score}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── KOLOM KANAN: KETERAMPILAN (HARD & SOFT SKILLS) ── */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Header Title with Line */}
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold tracking-widest uppercase text-paper-400 dark:text-paper-500 font-mono">
+                  KETERAMPILAN
+                </span>
+                <span className="h-[1.5px] w-12 bg-paper-300 dark:bg-paper-700 inline-block" />
+              </div>
+
+              <div className="space-y-6">
+                {/* 1. Hard Skills & Alat Teknis */}
+                <div className="p-5 sm:p-6 rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-white dark:bg-[#18181B] shadow-sm space-y-3.5">
+                  <div className="flex items-center justify-between pb-3 border-b border-paper-100 dark:border-paper-800">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-amber-500/10 dark:bg-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                        <Sparkles className="w-3.5 h-3.5" />
+                      </div>
+                      <h3 className="font-display text-sm sm:text-base font-bold text-paper-950 dark:text-paper-50">
+                        Hard Skills &amp; Alat Teknis
+                      </h3>
+                    </div>
+                    <span className="text-[11px] font-semibold text-paper-400">
+                      {hardSkillsList.length} Skills
+                    </span>
                   </div>
 
-                  {edu.score && (
-                    <div className="mt-4 pt-3 border-t border-paper-100 dark:border-paper-800/80 flex items-center justify-between">
-                      <span className="text-[11px] font-medium text-paper-400 uppercase tracking-wider">
-                        Prestasi / Evaluasi
+                  <div className="flex flex-wrap gap-2">
+                    {hardSkillsList.map((skill, sIdx) => (
+                      <span
+                        key={sIdx}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-paper-50 dark:bg-paper-900/60 text-paper-800 dark:text-paper-200 border border-paper-200/70 dark:border-paper-800 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span>{skill}</span>
                       </span>
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                        <Award className="w-3.5 h-3.5" />
-                        {edu.score}
-                      </span>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
-              ))}
+
+                {/* 2. Soft Skills & Kolaborasi */}
+                <div className="p-5 sm:p-6 rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-white dark:bg-[#18181B] shadow-sm space-y-3.5">
+                  <div className="flex items-center justify-between pb-3 border-b border-paper-100 dark:border-paper-800">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-amber-500/10 dark:bg-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      </div>
+                      <h3 className="font-display text-sm sm:text-base font-bold text-paper-950 dark:text-paper-50">
+                        Soft Skills &amp; Kolaborasi
+                      </h3>
+                    </div>
+                    <span className="text-[11px] font-semibold text-paper-400">
+                      {softSkillsList.length} Skills
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {softSkillsList.map((skill, sIdx) => (
+                      <span
+                        key={sIdx}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-paper-50 dark:bg-paper-900/60 text-paper-800 dark:text-paper-200 border border-paper-200/70 dark:border-paper-800 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span>{skill}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
-          {/* ─── 2. Pengalaman Organisasi ─── */}
+          {/* ─── PENGALAMAN ORGANISASI ─── */}
           <section className="space-y-6 pt-6 border-t border-paper-200/80 dark:border-paper-800/80">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
               <div className="space-y-1">
@@ -292,7 +386,7 @@ export default async function AboutPage() {
             </div>
           </section>
 
-          {/* ─── 3. Pengalaman Profesional (Jika ada) ─── */}
+          {/* ─── PENGALAMAN KERJA / PROYEK (Jika ada) ─── */}
           {experiences.length > 0 && (
             <section className="space-y-6 pt-6 border-t border-paper-200/80 dark:border-paper-800/80">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
@@ -334,64 +428,6 @@ export default async function AboutPage() {
               </div>
             </section>
           )}
-
-          {/* ─── 4. Keterampilan (Soft Skills & Hard Skills) ─── */}
-          <section className="space-y-6 pt-6 border-t border-paper-200/80 dark:border-paper-800/80">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                  <Layers className="w-4 h-4" />
-                  <span>Capabilities &amp; Competencies</span>
-                </div>
-                <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-paper-950 dark:text-paper-50">
-                  Keterampilan &amp; Penguasaan Alat
-                </h2>
-              </div>
-              <p className="text-xs sm:text-sm text-paper-500 dark:text-paper-400 max-w-md">
-                Kombinasi kemampuan teknis eksekusi dan interpersonal untuk menghadirkan solusi berkualitas.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-              {displayCapabilities.map((cap, i) => {
-                const skillList = cap.skills.split("\n").map(s => s.trim()).filter(Boolean);
-                const isHard = cap.title.toLowerCase().includes("hard") || cap.title.toLowerCase().includes("alat");
-
-                return (
-                  <div
-                    key={cap.id || i}
-                    className="p-6 sm:p-7 rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-white dark:bg-[#18181B] shadow-sm hover:shadow-md transition-all space-y-4"
-                  >
-                    <div className="flex items-center justify-between pb-3 border-b border-paper-100 dark:border-paper-800/80">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 dark:bg-amber-500/15 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                          {isHard ? <Sparkles className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
-                        </div>
-                        <h3 className="font-display text-base font-bold text-paper-950 dark:text-paper-50">
-                          {cap.title}
-                        </h3>
-                      </div>
-                      <span className="text-[11px] font-semibold text-paper-400">
-                        {skillList.length} Kompetensi
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {skillList.map((skill, sIdx) => (
-                        <div
-                          key={sIdx}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-paper-50 dark:bg-paper-900/60 text-paper-800 dark:text-paper-200 border border-paper-200/80 dark:border-paper-800 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                          <span>{skill}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
         </div>
       </main>
       <Footer />

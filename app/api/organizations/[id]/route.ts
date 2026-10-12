@@ -22,3 +22,4 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   await prisma.organization.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
+
