@@ -5,7 +5,7 @@ import { Download, ArrowUpRight, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import prisma from "@/lib/prisma";
-import { TECH_STACK } from "@/components/tech-stack-data";
+import { TECH_ROW_1, TECH_ROW_2 } from "@/components/tech-stack-data";
 
 export const dynamic = "force-dynamic";
 
@@ -169,7 +169,7 @@ export default async function AboutPage() {
               </div>
             </div>
 
-            {/* ── KOLOM KANAN: LOGO TEKNOLOGI ── */}
+            {/* ── KOLOM KANAN: LOGO TEKNOLOGI & ALAT (EXACT SCREENSHOT STYLE) ── */}
             <div className="lg:col-span-7 space-y-6">
               {/* Header Title with Line */}
               <div className="flex items-center gap-3">
@@ -179,21 +179,33 @@ export default async function AboutPage() {
                 <span className="h-[1.5px] w-12 bg-paper-300 dark:bg-paper-700 inline-block" />
               </div>
 
-              {/* Grid of Technology Logos */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-4 gap-3 sm:gap-4">
-                {TECH_STACK.map((tech) => (
-                  <div
-                    key={tech.name}
-                    className="flex flex-col items-center gap-2 p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-[#18181B] border border-paper-200/80 dark:border-paper-800/80 hover:border-amber-500/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group cursor-default"
-                  >
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center p-1 group-hover:scale-110 transition-transform">
+              {/* Exact 2 Rows of Clean Floating Logos */}
+              <div className="space-y-7 pt-2">
+                {/* Baris 1: Flutter, Next.js, CodeIgniter, React, Dart, Tailwind CSS, PHP */}
+                <div className="flex flex-wrap items-center gap-6 sm:gap-7 md:gap-8">
+                  {TECH_ROW_1.map((tech) => (
+                    <div
+                      key={tech.name}
+                      className="transition-transform duration-200 hover:scale-115 cursor-pointer"
+                      title={tech.name}
+                    >
                       {tech.icon}
                     </div>
-                    <span className="text-[11px] sm:text-xs font-semibold text-paper-700 dark:text-paper-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors text-center leading-tight truncate w-full">
-                      {tech.name}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Baris 2: Figma, Photoshop, Premiere Pro, Blender, Android Studio, Canva */}
+                <div className="flex flex-wrap items-center gap-6 sm:gap-7 md:gap-8">
+                  {TECH_ROW_2.map((tech) => (
+                    <div
+                      key={tech.name}
+                      className="transition-transform duration-200 hover:scale-115 cursor-pointer"
+                      title={tech.name}
+                    >
+                      {tech.icon}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
