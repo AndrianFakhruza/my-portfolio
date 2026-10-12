@@ -1,6 +1,6 @@
 export default function AdminDashboardLoading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6 skeleton-wave">
       {/* Page title */}
       <div className="h-8 w-48 bg-paper-200 dark:bg-paper-800 rounded-xl" />
 

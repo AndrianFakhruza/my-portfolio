@@ -1,6 +1,6 @@
 export default function ContactLoading() {
   return (
-    <div className="min-h-screen bg-paper-50 dark:bg-paper-950 animate-pulse">
+    <div className="min-h-screen bg-paper-50 dark:bg-paper-950 skeleton-wave">
       {/* Navbar placeholder */}
       <div className="fixed top-0 left-0 right-0 z-50 h-16 bg-paper-200 dark:bg-paper-800 rounded" />
 

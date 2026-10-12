@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useCallback, useTransition } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -17,7 +17,6 @@ import {
   X,
   ChevronRight,
   UserCircle,
-  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -39,13 +38,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  // Saat pathname berubah (navigasi selesai), reset navigatingTo
-  useEffect(() => {
-    setNavigatingTo(null);
-  }, [pathname]);
 
   const handleLogout = useCallback(
     async (reason?: string) => {
@@ -127,15 +119,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-[#F8F8F8] dark:bg-[#18181B] text-[#18181B] dark:text-[#F8F8F8]">
-      {/* Navigation Progress Bar */}
-      {isPending && (
-        <div className="fixed top-0 left-0 right-0 h-0.5 z-50">
-          <div className="h-full bg-[#F59E0B] animate-[progress_1.5s_ease-in-out_infinite]"
-            style={{ animation: "progressBar 1.2s ease-in-out infinite" }}
-          />
-        </div>
-      )}
-
       {/* ─── Sidebar Desktop (Fixed, Tidak ikut scroll halaman) ─── */}
       <aside className="hidden lg:flex w-60 flex-col flex-shrink-0 h-full bg-white dark:bg-[#18181B] border-r border-[#E4E4E7] dark:border-[#27272A] z-20">
         {/* Logo & Profil Brand */}
@@ -170,23 +153,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               item.href === "/admin"
                 ? pathname === "/admin"
                 : pathname.startsWith(item.href);
-            const isNavigating = navigatingTo === item.href;
             const Icon = item.icon;
 
             return (
-              <button
+              <Link
                 key={item.href}
-                onClick={() => {
-                  if (!isActive) {
-                    setNavigatingTo(item.href);
-                    startTransition(() => {
-                      router.push(item.href);
-                    });
-                  }
-                }}
+                href={item.href}
                 className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group text-left cursor-pointer",
-                  isActive || isNavigating
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group",
+                  isActive
                     ? "bg-amber-500/15 text-amber-600 dark:text-[#F59E0B] font-semibold"
                     : "text-paper-600 dark:text-paper-400 hover:bg-paper-100 dark:hover:bg-[#27272A] hover:text-[#18181B] dark:hover:text-[#F8F8F8]"
                 )}
@@ -194,21 +169,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span
                   className={cn(
                     "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
-                    isActive || isNavigating
+                    isActive
                       ? "bg-amber-500/20 text-amber-600 dark:text-[#F59E0B]"
                       : "bg-paper-100 dark:bg-[#27272A] text-paper-500 dark:text-paper-400 group-hover:bg-paper-200 dark:group-hover:bg-[#3F3F46]"
                   )}
                 >
-                  {isNavigating && isPending
-                    ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : <Icon className="w-4 h-4" />
-                  }
+                  <Icon className="w-4 h-4" />
                 </span>
                 <span className="flex-1">{item.name}</span>
-                {(isActive && !isNavigating) && (
+                {isActive && (
                   <ChevronRight className="w-3.5 h-3.5 opacity-60 text-[#F59E0B]" />
                 )}
-              </button>
+              </Link>
             );
           })}
         </nav>

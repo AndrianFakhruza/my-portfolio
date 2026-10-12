@@ -1,6 +1,6 @@
 export default function AdminMessagesLoading() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-6 skeleton-wave">
       {/* Header bar */}
       <div className="flex items-center justify-between">
         <div className="h-8 w-36 bg-paper-200 dark:bg-paper-800 rounded-xl" />
