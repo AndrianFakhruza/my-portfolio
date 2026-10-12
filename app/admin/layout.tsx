@@ -315,9 +315,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Area Konten Utama (Scrollable secara mandiri) */}
         <main className="flex-1 overflow-y-auto p-5 sm:p-6 lg:p-8">
-          <div className="max-w-7xl w-full mx-auto">
-            {children}
-          </div>
+          <AnimatePresence mode="wait" initial={true}>
+            <motion.div
+              key={pathname}
+              className="max-w-7xl w-full mx-auto"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 

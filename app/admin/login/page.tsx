@@ -4,8 +4,8 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Lock, ArrowLeft, Loader2, AlertCircle, Eye, EyeOff, Clock } from "lucide-react";
-import { motion } from "framer-motion";
+import { Lock, ArrowLeft, Loader2, AlertCircle, Eye, EyeOff, Clock, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 function LoginForm() {
   const router = useRouter();
@@ -16,6 +16,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -32,12 +33,14 @@ function LoginForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login gagal");
 
+      // Tampilkan animasi sukses, lalu redirect setelah 750ms
+      setLoginSuccess(true);
       const from = searchParams.get("from") || "/admin";
+      await new Promise((resolve) => setTimeout(resolve, 700));
       router.push(from);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Email atau kata sandi tidak valid.");
-    } finally {
       setLoading(false);
     }
   };
@@ -152,10 +155,25 @@ function LoginForm() {
           disabled={loading}
           className="w-full py-3 px-4 text-sm font-bold rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-[#18181B] shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed mt-2"
         >
-          {loading ? (
+          {loading || loginSuccess ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Memverifikasi...
+              {loginSuccess ? (
+                <motion.span
+                  key="check"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Berhasil masuk!
+                </motion.span>
+              ) : (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Memverifikasi...
+                </>
+              )}
             </>
           ) : (
             <>
@@ -165,6 +183,71 @@ function LoginForm() {
           )}
         </button>
       </form>
+
+      {/* ─── Full-screen success overlay ─── */}
+      <AnimatePresence>
+        {loginSuccess && (
+          <motion.div
+            className="fixed inset-0 z-[999] flex flex-col items-center justify-center gap-5 bg-[#18181B]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            {/* Amber glow circle */}
+            <motion.div
+              className="relative flex items-center justify-center"
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="absolute w-20 h-20 rounded-full bg-amber-500/20 blur-xl" />
+              <div className="relative w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
+                <motion.div
+                  initial={{ scale: 0, rotate: -30 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.2, duration: 0.35, ease: "backOut" }}
+                >
+                  <CheckCircle2 className="w-7 h-7 text-amber-400" />
+                </motion.div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="text-center space-y-1"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.35 }}
+            >
+              <p className="text-sm font-semibold text-white">Login berhasil!</p>
+              <p className="text-xs font-mono text-paper-500 tracking-widest uppercase">
+                Memuat dashboard…
+              </p>
+            </motion.div>
+
+            {/* Progress dots */}
+            <motion.div
+              className="flex items-center gap-1.5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35, duration: 0.3 }}
+            >
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-1.5 h-1.5 rounded-full bg-amber-500"
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{
+                    duration: 0.9,
+                    repeat: Infinity,
+                    delay: i * 0.18,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
