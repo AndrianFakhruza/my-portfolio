@@ -8,9 +8,6 @@ import { ProjectCard } from "@/components/project-card";
 
 export const dynamic = "force-dynamic";
 
-import { TECH_STACK } from "@/components/tech-stack-data";
-
-
 export default async function HomePage() {
   const featuredProjects = await prisma.project.findMany({
     where: { status: "published", featured: true },
@@ -154,36 +151,6 @@ export default async function HomePage() {
                 index={idx}
               />
             ))}
-          </div>
-        </section>
-
-        {/* TECH STACK SHOWCASE */}
-        <section className="py-12 sm:py-16 border-t border-paper-200/80 dark:border-paper-800/80">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8">
-            <div className="flex items-center gap-2 mb-8">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-500" />
-              <span className="text-xs font-bold uppercase tracking-wider text-paper-500 dark:text-paper-400">
-                Teknologi &amp; Keahlian Utama
-              </span>
-            </div>
-
-            <div className="flex flex-wrap gap-4 sm:gap-5">
-              {TECH_STACK.map((tech) => (
-                <div
-                  key={tech.name}
-                  className="flex flex-col items-center gap-2 group cursor-default"
-                >
-                  <div className="w-[76px] h-[76px] sm:w-20 sm:h-20 rounded-2xl bg-paper-100 dark:bg-paper-800/80 border border-paper-200/80 dark:border-paper-700/50 flex items-center justify-center shadow-sm group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-accent-500/15 group-hover:border-accent-500/30 transition-all duration-200">
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center">
-                      {tech.icon}
-                    </div>
-                  </div>
-                  <span className="text-xs font-semibold text-paper-600 dark:text-paper-300 group-hover:text-accent-500 transition-colors text-center leading-tight max-w-[76px] sm:max-w-[80px]">
-                    {tech.name}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
       </main>
