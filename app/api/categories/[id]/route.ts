@@ -49,14 +49,43 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.category.delete({
+
+    // Cek apakah kategori ada
+    const category = await prisma.category.findUnique({
       where: { id },
+      include: { projects: { select: { id: true, title: true } } },
     });
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Category DELETE error:", error);
-    return NextResponse.json({ error: "Gagal menghapus kategori" }, { status: 500 });
+    if (!category) {
+      // Idempotent: jika sudah terhapus atau tidak ada di DB, kembalikan status success agar UI client sinkron
+      return NextResponse.json({
+        success: true,
+        message: "Kategori sudah tidak ada atau telah terhapus sebelumnya.",
+        alreadyDeleted: true,
+      });
+    }
+
+    // Gunakan prisma transaction agar atomik dan konsisten
+    await prisma.$transaction(async (tx) => {
+      if (category.projects.length > 0) {
+        await tx.project.deleteMany({
+          where: { categoryId: id },
+        });
+      }
+      await tx.category.delete({
+        where: { id },
+      });
+    });
+
+    return NextResponse.json({
+      success: true,
+      deletedProjects: category.projects.length,
+    });
+  } catch (error: any) {
+    console.error("Category DELETE error:", error?.message ?? error);
+    return NextResponse.json(
+      { error: "Gagal menghapus kategori: " + (error?.message ?? "Terjadi kesalahan server") },
+      { status: 500 }
+    );
   }
 }
-

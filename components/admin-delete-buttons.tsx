@@ -14,10 +14,11 @@ export function DeleteProjectButton({ id, title }: { id: string; title: string }
     setLoading(true);
     try {
       const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Gagal menghapus proyek");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus proyek");
       router.refresh();
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Gagal menghapus proyek.");
     } finally {
       setLoading(false);
     }
@@ -46,10 +47,11 @@ export function DeletePostButton({ id, title }: { id: string; title: string }) {
     setLoading(true);
     try {
       const res = await fetch(`/api/posts/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Gagal menghapus artikel");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus artikel");
       router.refresh();
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Gagal menghapus artikel.");
     } finally {
       setLoading(false);
     }
@@ -68,20 +70,39 @@ export function DeletePostButton({ id, title }: { id: string; title: string }) {
   );
 }
 
-export function DeleteCategoryButton({ id, name }: { id: string; name: string }) {
+export function DeleteCategoryButton({
+  id,
+  name,
+  projectCount = 0,
+  onDeleted,
+}: {
+  id: string;
+  name: string;
+  projectCount?: number;
+  onDeleted?: (id: string) => void;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Hapus kategori "${name}"? Proyek dalam kategori ini akan terpengaruh.`)) return;
+    const confirmMessage =
+      projectCount > 0
+        ? `Kategori "${name}" memiliki ${projectCount} proyek terhubung. Jika kategori ini dihapus, proyek di dalamnya juga akan ikut terhapus secara permanen. Lanjutkan menghapus?`
+        : `Hapus kategori "${name}" secara permanen?`;
+
+    if (!confirm(confirmMessage)) return;
 
     setLoading(true);
     try {
       const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Gagal menghapus kategori");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Gagal menghapus kategori");
+      }
+      onDeleted?.(id);
       router.refresh();
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Gagal menghapus kategori.");
     } finally {
       setLoading(false);
     }
@@ -110,10 +131,11 @@ export function DeleteMessageButton({ id }: { id: string }) {
     setLoading(true);
     try {
       const res = await fetch(`/api/messages/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Gagal menghapus pesan");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Gagal menghapus pesan");
       router.refresh();
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Gagal menghapus pesan.");
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Edit3, Loader2, Save, X } from "lucide-react";
 import { DeleteCategoryButton } from "./admin-delete-buttons";
@@ -18,7 +18,11 @@ interface Category {
 
 export function AdminCategoriesView({ initialCategories }: { initialCategories: Category[] }) {
   const router = useRouter();
-  const [categories] = useState<Category[]>(initialCategories);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+
+  useEffect(() => {
+    setCategories(initialCategories);
+  }, [initialCategories]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -73,6 +77,21 @@ export function AdminCategoriesView({ initialCategories }: { initialCategories: 
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan kategori");
+
+      if (data.category) {
+        if (editingCategory) {
+          setCategories((prev) =>
+            prev.map((c) =>
+              c.id === data.category.id ? { ...c, ...data.category } : c
+            )
+          );
+        } else {
+          setCategories((prev) => [
+            ...prev,
+            { ...data.category, _count: { projects: 0 } },
+          ]);
+        }
+      }
 
       setIsModalOpen(false);
       router.refresh();
@@ -148,7 +167,14 @@ export function AdminCategoriesView({ initialCategories }: { initialCategories: 
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
-                    <DeleteCategoryButton id={cat.id} name={cat.name} />
+                    <DeleteCategoryButton
+                      id={cat.id}
+                      name={cat.name}
+                      projectCount={cat._count?.projects ?? 0}
+                      onDeleted={(deletedId) =>
+                        setCategories((prev) => prev.filter((c) => c.id !== deletedId))
+                      }
+                    />
                   </div>
                 </td>
               </tr>
