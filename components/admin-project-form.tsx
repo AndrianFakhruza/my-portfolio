@@ -37,10 +37,8 @@ interface ProjectData {
   summary: string;
   content: string;
   categoryId: string;
-  tags: string;
   cover: string;
   gallery: GalleryItem[];
-  role: string;
   tools: string;
   liveUrl: string;
   repoUrl: string;
@@ -68,10 +66,8 @@ export function AdminProjectForm({
     summary: initialData?.summary || "",
     content: initialData?.content || "",
     categoryId: initialData?.categoryId || (categories[0]?.id || ""),
-    tags: initialData?.tags || "",
     cover: initialData?.cover || "",
     gallery: initialData?.gallery || [],
-    role: initialData?.role || "",
     tools: initialData?.tools || "",
     liveUrl: initialData?.liveUrl || "",
     repoUrl: initialData?.repoUrl || "",
@@ -501,24 +497,11 @@ export function AdminProjectForm({
             </div>
           </div>
 
-          {/* Metadata: Role, Tools, Links */}
+          {/* Metadata: Tools, Links */}
           <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
             <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300 pb-2 border-b border-paper-200 dark:border-paper-800">
               Spesifikasi Karya
             </h3>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Peran (Role)
-              </label>
-              <input
-                type="text"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                placeholder="mis. Lead Product Designer & Dev"
-                className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
-            </div>
 
             <div className="space-y-1.5">
               <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
@@ -529,19 +512,6 @@ export function AdminProjectForm({
                 value={formData.tools}
                 onChange={(e) => setFormData({ ...formData, tools: e.target.value })}
                 placeholder="mis. Next.js, Figma, Tailwind, TypeScript"
-                className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Tagar / Tags (pisahkan koma)
-              </label>
-              <input
-                type="text"
-                value={formData.tags}
-                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                placeholder="mis. Fintech, Dashboard, SaaS"
                 className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
               />
             </div>
