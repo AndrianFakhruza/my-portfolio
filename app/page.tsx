@@ -102,7 +102,7 @@ export default async function HomePage() {
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-[320px] sm:max-w-[360px] aspect-[4/5] rounded-3xl overflow-hidden border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card hover:shadow-card-hover transition-all duration-300 group">
                 <Image
-                  src="/profile.jpg"
+                  src="/profile.png"
                   alt="Andrian Fakhruza - Web Developer & UI Designer"
                   fill
                   priority

@@ -63,7 +63,7 @@ function LoginForm() {
 
         <div className="relative w-12 h-12 rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-lg shadow-amber-500/20 mb-4">
           <Image
-            src="/profile.jpg"
+            src="/profile.png"
             alt="Andrian Fakhruza"
             fill
             sizes="48px"
@@ -282,7 +282,7 @@ export default function AdminLoginPage() {
         >
           <div className="relative w-11 h-11 rounded-2xl overflow-hidden border-2 border-amber-500/40 shadow-lg shadow-amber-500/25">
             <Image
-              src="/profile.jpg"
+              src="/profile.png"
               alt="Andrian Fakhruza"
               fill
               sizes="44px"

@@ -48,7 +48,7 @@ export function Navbar() {
         >
           <div className="relative w-8 sm:w-9 h-8 sm:h-9 rounded-full overflow-hidden border-2 border-[#F59E0B]/60 shadow-sm group-hover:scale-105 transition-transform shrink-0">
             <Image
-              src="/profile.jpg"
+              src="/profile.png"
               alt="Andrian Fakhruza"
               fill
               className="object-cover"

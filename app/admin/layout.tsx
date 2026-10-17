@@ -132,7 +132,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="h-16 flex items-center gap-3 px-5 border-b border-[#E4E4E7] dark:border-[#27272A] flex-shrink-0">
           <div className="relative w-8 h-8 rounded-full overflow-hidden border border-amber-500/40 shadow-sm shadow-amber-500/20 flex-shrink-0">
             <Image
-              src="/profile.jpg"
+              src="/profile.png"
               alt="Andrian Fakhruza"
               fill
               sizes="32px"
@@ -260,7 +260,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Avatar Profil Foto User */}
             <div className="relative w-8 h-8 rounded-full overflow-hidden border border-paper-200 dark:border-paper-700 shadow-sm flex-shrink-0" title="Andrian Fakhruza">
               <Image
-                src="/profile.jpg"
+                src="/profile.png"
                 alt="Andrian Fakhruza"
                 fill
                 sizes="32px"

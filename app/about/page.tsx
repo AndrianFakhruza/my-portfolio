@@ -99,7 +99,7 @@ export default async function AboutPage() {
             <div className="lg:col-span-5">
               <div className="relative aspect-[4/5] w-full max-w-[280px] sm:max-w-xs mx-auto overflow-hidden rounded-3xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card">
                 <Image
-                  src="/profile.jpg"
+                  src="/profile.png"
                   alt={`${profile?.name ?? "Andrian Fakhruza"} - Web Developer & UI Designer`}
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"

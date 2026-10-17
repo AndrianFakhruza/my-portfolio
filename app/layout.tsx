@@ -53,6 +53,11 @@ export const metadata: Metadata = {
     description:
       "Portofolio profesional Andrian Fakhruza dalam pembangunan website modern, desain UI responsif, serta eksplorasi Data Science dan Machine Learning.",
   },
+  icons: {
+    icon: "/profile.png",
+    shortcut: "/profile.png",
+    apple: "/profile.png",
+  },
 };
 
 export default function RootLayout({

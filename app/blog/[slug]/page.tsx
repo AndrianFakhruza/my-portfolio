@@ -86,7 +86,7 @@ export default async function ArticleDetailPage({ params }: ArticleDetailProps) 
             <div className="flex items-center gap-3.5 pt-4">
               <div className="relative w-11 h-11 rounded-full overflow-hidden border-2 border-accent-500/30 shadow-md">
                 <Image
-                  src="/profile.jpg"
+                  src="/profile.png"
                   alt="Andrian Fakhruza"
                   fill
                   className="object-cover"

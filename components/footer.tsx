@@ -99,7 +99,7 @@ export function Footer() {
           <div className="flex items-center gap-2.5">
             <div className="relative w-6 h-6 rounded-full overflow-hidden border border-[#F59E0B]/40 shrink-0">
               <Image
-                src="/profile.jpg"
+                src="/profile.png"
                 alt="Andrian Fakhruza"
                 fill
                 className="object-cover"
