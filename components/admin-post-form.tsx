@@ -57,7 +57,7 @@ export function AdminPostForm({ initialData, isEditing = false }: AdminPostFormP
     setFormData((prev) => ({
       ...prev,
       title: val,
-      slug: !isEditing ? slugify(val) : prev.slug,
+      slug: slugify(val),
     }));
   };
 
@@ -189,20 +189,10 @@ export function AdminPostForm({ initialData, isEditing = false }: AdminPostFormP
                 placeholder="mis. Mengapa Portofolio Desainer Tidak Boleh..."
                 className="w-full px-4 py-2.5 text-sm bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
               />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
-                Slug URL
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                placeholder="mis. portofolio-tanpa-template-ai"
-                className="w-full px-4 py-2 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
+              <div className="flex items-center gap-1.5 text-[11px] font-mono text-paper-500 pt-0.5">
+                <span className="text-paper-400">URL publik:</span>
+                <span className="text-accent-500 font-semibold">/blog/{formData.slug || "..."}</span>
+              </div>
             </div>
 
             <div className="space-y-1.5">
