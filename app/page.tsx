@@ -5,16 +5,19 @@ import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ProjectCard } from "@/components/project-card";
+import { sortProjects } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const featuredProjects = await prisma.project.findMany({
+  const rawFeaturedProjects = await prisma.project.findMany({
     where: { status: "published", featured: true },
     include: { category: true },
-    orderBy: { order: "asc" },
-    take: 6,
+    orderBy: { createdAt: "desc" },
+    take: 12,
   });
+
+  const featuredProjects = sortProjects(rawFeaturedProjects).slice(0, 6);
 
   return (
     <>

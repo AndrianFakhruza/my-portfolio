@@ -100,6 +100,9 @@ export function AdminProjectForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Reset input agar memilih file yang sama tetap memicu onChange
+    const inputElement = e.target;
+
     setUploadingCover(true);
     try {
       const data = new FormData();
@@ -110,13 +113,19 @@ export function AdminProjectForm({
         body: data,
       });
 
-      const resData = await res.json();
-      if (!res.ok) throw new Error(resData.error || "Gagal mengunggah");
+      const resData = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Sesi login admin Anda telah kedaluwarsa. Silakan refresh dan masuk kembali.");
+        }
+        throw new Error(resData.error || `Gagal mengunggah gambar (Status ${res.status})`);
+      }
 
       setFormData((prev) => ({ ...prev, cover: resData.url }));
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Gagal mengunggah gambar cover.");
     } finally {
+      inputElement.value = "";
       setUploadingCover(false);
     }
   };
@@ -126,6 +135,7 @@ export function AdminProjectForm({
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    const inputElement = e.target;
     setUploadingGallery(true);
     try {
       for (let i = 0; i < files.length; i++) {
@@ -138,17 +148,20 @@ export function AdminProjectForm({
           body: data,
         });
 
-        const resData = await res.json();
-        if (res.ok) {
-          setFormData((prev) => ({
-            ...prev,
-            gallery: [...prev.gallery, { url: resData.url, caption: "" }],
-          }));
+        const resData = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(resData.error || `Gagal mengunggah ${file.name}`);
         }
+
+        setFormData((prev) => ({
+          ...prev,
+          gallery: [...prev.gallery, { url: resData.url, caption: "" }],
+        }));
       }
     } catch (err: any) {
-      alert("Error saat unggah gambar galeri");
+      alert(err.message || "Terjadi kesalahan saat mengunggah gambar galeri.");
     } finally {
+      inputElement.value = "";
       setUploadingGallery(false);
     }
   };
@@ -440,14 +453,18 @@ export function AdminProjectForm({
 
             <div className="space-y-1.5 pt-2">
               <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Urutan Tampil (Nomor)
+                Urutan Tampil (Opsional)
               </label>
               <input
                 type="number"
+                min={0}
                 value={formData.order}
-                onChange={(e) => setFormData({ ...formData, order: Number(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, order: Math.max(0, Number(e.target.value) || 0) })}
                 className="w-full px-3 py-1.5 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
               />
+              <p className="text-[11px] text-paper-500 dark:text-paper-400 leading-normal">
+                Beri <span className="font-semibold text-accent-500">0</span> untuk otomatis (proyek terbaru tampil paling awal). Isi angka <span className="font-semibold text-accent-500">1</span> jika ingin diprioritaskan di nomor satu paling atas.
+              </p>
             </div>
           </div>
 

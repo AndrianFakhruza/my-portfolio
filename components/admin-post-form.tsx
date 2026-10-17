@@ -74,6 +74,7 @@ export function AdminPostForm({ initialData, isEditing = false }: AdminPostFormP
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const inputElement = e.target;
     setUploadingCover(true);
     try {
       const data = new FormData();
@@ -84,13 +85,19 @@ export function AdminPostForm({ initialData, isEditing = false }: AdminPostFormP
         body: data,
       });
 
-      const resData = await res.json();
-      if (!res.ok) throw new Error(resData.error || "Gagal mengunggah gambar");
+      const resData = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Sesi login admin Anda telah kedaluwarsa. Silakan refresh dan masuk kembali.");
+        }
+        throw new Error(resData.error || `Gagal mengunggah gambar (Status ${res.status})`);
+      }
 
       setFormData((prev) => ({ ...prev, cover: resData.url }));
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || "Gagal mengunggah gambar.");
     } finally {
+      inputElement.value = "";
       setUploadingCover(false);
     }
   };

@@ -11,19 +11,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Tidak ada file yang diunggah" }, { status: 400 });
     }
 
-    // Validate mime type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml", "image/gif", "image/avif"];
-    if (!validTypes.includes(file.type)) {
+    // Validate image by mime type or file extension
+    const mime = (file.type || "").toLowerCase();
+    const ext = (path.extname(file.name) || "").toLowerCase();
+    const validExts = [".jpg", ".jpeg", ".png", ".webp", ".svg", ".gif", ".avif", ".ico", ".bmp", ".tiff", ".heic", ".heif"];
+    const isImageMime = mime.startsWith("image/");
+    const isValidExt = validExts.includes(ext);
+
+    if (!isImageMime && !isValidExt) {
       return NextResponse.json(
         { error: "Format gambar tidak didukung. Gunakan JPG, PNG, WebP, SVG, AVIF, atau GIF." },
         { status: 400 }
       );
     }
 
-    // Limit size 5MB
-    if (file.size > 5 * 1024 * 1024) {
+    // Limit size 25MB (mencegah penolakan pada foto resolusi tinggi / export Figma)
+    if (file.size > 25 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "Ukuran gambar maksimal 5MB." },
+        { error: "Ukuran gambar terlalu besar. Maksimal 25MB." },
         { status: 400 }
       );
     }
@@ -35,10 +40,10 @@ export async function POST(request: Request) {
     await mkdir(uploadsDir, { recursive: true });
 
     // Generate safe clean filename
-    const ext = path.extname(file.name) || ".jpg";
+    const safeExt = ext || ".jpg";
     const baseName = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, "-").toLowerCase();
     const timestamp = Date.now();
-    const fileName = `${baseName}-${timestamp}${ext}`;
+    const fileName = `${baseName || "image"}-${timestamp}${safeExt}`;
     const filePath = path.join(uploadsDir, fileName);
 
     await writeFile(filePath, buffer);

@@ -54,4 +54,25 @@ export function extractHeadings(markdown: string): HeadingItem[] {
   return headings;
 }
 
+/**
+ * Mengurutkan proyek:
+ * - Jika ada proyek yang diset nomor urutnya (order > 0, mis. 1, 2, dst), maka akan diprioritaskan di atas
+ * - Secara default (order = 0), proyek diurutkan dari yang terbaru (newest first)
+ */
+export function sortProjects<T extends { order: number; createdAt: Date | string }>(projects: T[]): T[] {
+  return [...projects].sort((a, b) => {
+    const orderA = a.order > 0 ? a.order : 999999;
+    const orderB = b.order > 0 ? b.order : 999999;
+
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+
+    const timeA = new Date(a.createdAt).getTime();
+    const timeB = new Date(b.createdAt).getTime();
+    return timeB - timeA;
+  });
+}
+
+
 

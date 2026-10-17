@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
-import { slugify } from "@/lib/utils";
+import { slugify, sortProjects } from "@/lib/utils";
 
 export async function GET(request: Request) {
   try {
@@ -35,16 +35,15 @@ export async function GET(request: Request) {
       ];
     }
 
-    const projects = await prisma.project.findMany({
+    const rawProjects = await prisma.project.findMany({
       where,
       include: {
         category: true,
       },
-      orderBy: [
-        { order: "asc" },
-        { createdAt: "desc" },
-      ],
+      orderBy: { createdAt: "desc" },
     });
+
+    const projects = sortProjects(rawProjects);
 
     return NextResponse.json({ projects });
   } catch (error) {

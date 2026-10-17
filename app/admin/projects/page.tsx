@@ -3,17 +3,17 @@ import Image from "next/image";
 import { Plus, Edit3, ExternalLink } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { DeleteProjectButton } from "@/components/admin-delete-buttons";
+import { sortProjects } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProjectsPage() {
-  const projects = await prisma.project.findMany({
+  const rawProjects = await prisma.project.findMany({
     include: { category: true },
-    orderBy: [
-      { order: "asc" },
-      { createdAt: "desc" },
-    ],
+    orderBy: { createdAt: "desc" },
   });
+
+  const projects = sortProjects(rawProjects);
 
   return (
     <div className="space-y-8">

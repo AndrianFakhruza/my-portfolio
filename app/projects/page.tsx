@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ProjectsView } from "@/components/projects-view";
+import { sortProjects } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Arsip Portofolio & Proyek",
@@ -13,16 +14,18 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
-  const [projects, categories] = await Promise.all([
+  const [rawProjects, categories] = await Promise.all([
     prisma.project.findMany({
       where: { status: "published" },
       include: { category: true },
-      orderBy: { order: "asc" },
+      orderBy: { createdAt: "desc" },
     }),
     prisma.category.findMany({
       orderBy: { name: "asc" },
     }),
   ]);
+
+  const projects = sortProjects(rawProjects);
 
   return (
     <>
