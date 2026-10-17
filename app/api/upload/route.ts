@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
+import { createClient } from "@supabase/supabase-js";
 import path from "path";
+
+const BUCKET = "uploads";
+
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error("Supabase env variables not set");
+  return createClient(url, key);
+}
 
 export async function POST(request: Request) {
   try {
@@ -25,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Limit size 25MB (mencegah penolakan pada foto resolusi tinggi / export Figma)
+    // Limit size 25MB
     if (file.size > 25 * 1024 * 1024) {
       return NextResponse.json(
         { error: "Ukuran gambar terlalu besar. Maksimal 25MB." },
@@ -36,19 +45,33 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
-
     // Generate safe clean filename
     const safeExt = ext || ".jpg";
     const baseName = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, "-").toLowerCase();
     const timestamp = Date.now();
     const fileName = `${baseName || "image"}-${timestamp}${safeExt}`;
-    const filePath = path.join(uploadsDir, fileName);
 
-    await writeFile(filePath, buffer);
+    const supabase = getSupabase();
 
-    const publicUrl = `/uploads/${fileName}`;
+    // Upload ke Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(fileName, buffer, {
+        contentType: mime || "image/jpeg",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("Supabase upload error:", uploadError);
+      return NextResponse.json(
+        { error: `Gagal mengunggah ke storage: ${uploadError.message}` },
+        { status: 500 }
+      );
+    }
+
+    // Dapatkan public URL
+    const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
+    const publicUrl = urlData.publicUrl;
 
     return NextResponse.json({
       success: true,
@@ -67,33 +90,29 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const { readdir, stat } = await import("fs/promises");
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
+    const supabase = getSupabase();
 
-    const files = await readdir(uploadsDir);
-    const mediaList = [];
+    const { data: files, error } = await supabase.storage.from(BUCKET).list("", {
+      limit: 200,
+      sortBy: { column: "created_at", order: "desc" },
+    });
 
-    for (const file of files) {
-      if (file.startsWith(".")) continue;
-      const filePath = path.join(uploadsDir, file);
-      try {
-        const stats = await stat(filePath);
-        if (stats.isFile()) {
-          mediaList.push({
-            name: file,
-            url: `/uploads/${file}`,
-            size: stats.size,
-            createdAt: stats.birthtime,
-          });
-        }
-      } catch {
-        // ignore individual file error
-      }
+    if (error) {
+      console.error("Media list error:", error);
+      return NextResponse.json({ error: "Gagal mengambil daftar media" }, { status: 500 });
     }
 
-    // Sort newest first
-    mediaList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const mediaList = (files || [])
+      .filter((f) => !f.name.startsWith("."))
+      .map((f) => {
+        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name);
+        return {
+          name: f.name,
+          url: urlData.publicUrl,
+          size: f.metadata?.size ?? 0,
+          createdAt: f.created_at,
+        };
+      });
 
     return NextResponse.json({ media: mediaList });
   } catch (error) {
@@ -104,15 +123,19 @@ export async function GET() {
 
 export async function DELETE(request: Request) {
   try {
-    const { unlink } = await import("fs/promises");
     const { fileName } = await request.json();
 
     if (!fileName || fileName.includes("..") || fileName.includes("/") || fileName.includes("\\")) {
       return NextResponse.json({ error: "Nama file tidak valid" }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), "public", "uploads", fileName);
-    await unlink(filePath);
+    const supabase = getSupabase();
+    const { error } = await supabase.storage.from(BUCKET).remove([fileName]);
+
+    if (error) {
+      console.error("Media delete error:", error);
+      return NextResponse.json({ error: "Gagal menghapus file" }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -120,4 +143,3 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Gagal menghapus file" }, { status: 500 });
   }
 }
-
