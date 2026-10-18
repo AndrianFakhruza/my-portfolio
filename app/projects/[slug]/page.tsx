@@ -111,53 +111,52 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
           <p className="text-sm sm:text-base text-paper-600 dark:text-paper-300 leading-relaxed font-normal max-w-3xl">
             {project.summary}
           </p>
-        </header>
 
-        {/* Compact Quick Spec & Action Bar */}
-        <div className="py-2.5 px-4 rounded-xl border border-paper-200/80 dark:border-paper-800/80 bg-card-bg shadow-soft flex flex-wrap items-center justify-between gap-3 text-xs mb-5">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
-            {toolsList.length > 0 && (
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-paper-400 font-medium">Alat: </span>
-                {toolsList.map((tool) => (
-                  <span
-                    key={tool}
-                    className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-paper-100 dark:bg-paper-800/80 border border-paper-200/70 dark:border-paper-700/60 text-paper-700 dark:text-paper-300"
-                  >
-                    {tool}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {(project.liveUrl || project.repoUrl) && (
-            <div className="flex items-center gap-2">
-              {project.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-500 text-white hover:bg-accent-600 shadow-sm transition-colors"
-                >
-                  <span>Live Demo</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+          {(toolsList.length > 0 || project.liveUrl || project.repoUrl) && (
+            <div className="pt-1 flex flex-wrap items-center justify-between gap-3 text-xs">
+              {toolsList.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-paper-400 font-medium">Alat:</span>
+                  {toolsList.map((tool) => (
+                    <span
+                      key={tool}
+                      className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-paper-100 dark:bg-paper-800/80 border border-paper-200/70 dark:border-paper-700/60 text-paper-700 dark:text-paper-300"
+                    >
+                      {tool}
+                    </span>
+                  ))}
+                </div>
               )}
-              {project.repoUrl && (
-                <a
-                  href={project.repoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-paper-100 dark:bg-paper-800 border border-paper-200 dark:border-paper-700 text-paper-700 dark:text-paper-300 hover:text-accent-500 transition-colors"
-                >
-                  <Github className="w-3 h-3" />
-                  <span>Kode</span>
-                </a>
+
+              {(project.liveUrl || project.repoUrl) && (
+                <div className="flex items-center gap-2">
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-500 text-white hover:bg-accent-600 shadow-sm transition-colors"
+                    >
+                      <span>Live Demo</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                  {project.repoUrl && (
+                    <a
+                      href={project.repoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-paper-100 dark:bg-paper-800 border border-paper-200 dark:border-paper-700 text-paper-700 dark:text-paper-300 hover:text-accent-500 transition-colors"
+                    >
+                      <Github className="w-3 h-3" />
+                      <span>Kode</span>
+                    </a>
+                  )}
+                </div>
               )}
             </div>
           )}
-        </div>
+        </header>
 
         {/* Compact Hero Cover Image */}
         <div className="relative aspect-[21/9] sm:aspect-[2/1] w-full overflow-hidden rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card mb-7">
