@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ExternalLink, Github, Layers } from "lucide-react";
 import prisma from "@/lib/prisma";
-import { extractHeadings, formatDate, calculateReadingTime } from "@/lib/utils";
+import { cn, extractHeadings, formatDate, calculateReadingTime } from "@/lib/utils";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { LightboxGallery } from "@/components/lightbox-gallery";
@@ -63,11 +63,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
 
   const toolsList = project.tools ? project.tools.split(",").map((t) => t.trim()) : [];
   const headings = extractHeadings(project.content || "");
+  const isTwoColumn = headings.length > 0;
 
   return (
     <>
       <Navbar />
-      <main className="flex-1 w-full max-w-5xl mx-auto px-5 sm:px-8">
+      <main className={cn("flex-1 w-full mx-auto px-5 sm:px-8", isTwoColumn ? "max-w-5xl" : "max-w-3xl")}>
         {/* Compact Back nav + Live / GitHub Action Links */}
         <div className="pt-24 sm:pt-28 pb-3 flex flex-wrap items-center justify-between gap-3">
           <Link
@@ -153,14 +154,14 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
           )}
         </header>
 
-        {/* Compact Hero Cover Image - Balanced Aspect Ratio */}
-        <div className="relative aspect-[16/9] sm:aspect-[21/9] max-h-[380px] sm:max-h-[420px] w-full overflow-hidden rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card mb-8">
+        {/* Hero Cover Image - Proportionate Width & Height */}
+        <div className="relative max-w-3xl mx-auto aspect-[16/10] sm:aspect-[16/9] max-h-[360px] sm:max-h-[380px] w-full overflow-hidden rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card mb-8">
           <Image
             src={project.cover}
             alt={project.title}
             fill
             priority
-            sizes="(max-width: 1024px) 100vw, 1024px"
+            sizes="(max-width: 768px) 100vw, 768px"
             className="object-cover object-top"
           />
         </div>
