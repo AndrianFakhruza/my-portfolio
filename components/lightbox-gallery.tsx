@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Maximize2, ChevronDown, ChevronUp, Images } from "lucide-react";
 
 interface GalleryItem {
   url: string;
@@ -15,6 +15,7 @@ interface LightboxGalleryProps {
 
 export function LightboxGallery({ items }: LightboxGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const isOpen = selectedIndex !== null;
 
@@ -52,35 +53,102 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
 
   if (!items || items.length === 0) return null;
 
+  // Tampilkan max 3 item jika belum di-expand dan item lebih dari 2
+  const hasMoreThanTwo = items.length > 2;
+  const displayedItems = (!isExpanded && hasMoreThanTwo) ? items.slice(0, 3) : items;
+  const remainingCount = items.length - 2;
+
   return (
-    <div>
-      {/* Gallery Grid - Compact 3-column */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        {items.map((item, index) => (
-          <figure
-            key={index}
-            className="group relative cursor-pointer rounded-xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-            onClick={() => setSelectedIndex(index)}
-          >
-            <div className="relative aspect-[16/10] w-full">
-              <Image
-                src={item.url}
-                alt={item.caption || `Galeri item ${index + 1}`}
-                fill
-                sizes="(max-width: 640px) 50vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/35 transition-colors flex items-center justify-center">
-                <span className="p-2 rounded-full bg-white/95 dark:bg-paper-900/95 text-paper-900 dark:text-paper-100 opacity-0 group-hover:opacity-100 transition-opacity transform scale-90 group-hover:scale-100 duration-200 shadow-sm">
-                  <Maximize2 className="w-3.5 h-3.5" />
-                </span>
-              </div>
+    <div className="space-y-4">
+      {/* Masonry / Pinterest Style Dynamic Flow Layout */}
+      <div className="columns-1 sm:columns-2 gap-4 sm:gap-6 [column-fill:_balance]">
+        {displayedItems.map((item, index) => {
+          const isThirdFadeItem = !isExpanded && hasMoreThanTwo && index === 2;
+
+          return (
+            <div
+              key={index}
+              className="break-inside-avoid mb-4 sm:mb-6"
+            >
+              <figure
+                className={`group relative cursor-pointer rounded-2xl border border-paper-200/90 dark:border-paper-800/90 bg-white dark:bg-[#1f1f23] overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 ${
+                  isThirdFadeItem ? "max-h-[340px] pointer-events-none sm:pointer-events-auto" : ""
+                }`}
+                onClick={() => {
+                  if (isThirdFadeItem) {
+                    setIsExpanded(true);
+                  } else {
+                    setSelectedIndex(index);
+                  }
+                }}
+              >
+                {/* Natural aspect ratio image with full responsive height */}
+                <div className="relative w-full overflow-hidden bg-paper-100 dark:bg-paper-900/50">
+                  <Image
+                    src={item.url}
+                    alt={item.caption || `Galeri karya ${index + 1}`}
+                    width={1200}
+                    height={1600}
+                    className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    priority={index < 2}
+                  />
+
+                  {/* Hover Overlay preview icon */}
+                  {!isThirdFadeItem && (
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center pointer-events-none">
+                      <span className="p-2.5 rounded-full bg-white/95 dark:bg-paper-900/95 text-paper-900 dark:text-paper-100 opacity-0 group-hover:opacity-100 transition-all transform scale-75 group-hover:scale-100 duration-200 shadow-lg">
+                        <Maximize2 className="w-4 h-4" />
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Gradient Fade & Button Overlay untuk item ke-3 */}
+                  {isThirdFadeItem && (
+                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#18181B] dark:via-[#18181B]/85 dark:to-transparent flex flex-col items-center justify-end p-6 z-10 pointer-events-auto">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsExpanded(true);
+                        }}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold uppercase tracking-wider shadow-lg shadow-accent-500/25 hover:shadow-accent-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                      >
+                        <Images className="w-4 h-4" />
+                        <span>Lihat Semua ({items.length} Foto)</span>
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Optional Caption under card */}
+                {item.caption && !isThirdFadeItem && (
+                  <figcaption className="p-3 text-xs font-mono text-paper-600 dark:text-paper-400 border-t border-paper-100 dark:border-paper-800/60 bg-paper-50/50 dark:bg-paper-900/40">
+                    {item.caption}
+                  </figcaption>
+                )}
+              </figure>
             </div>
-          </figure>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Button Toggle Sembunyikan jika sudah di-expand */}
+      {isExpanded && hasMoreThanTwo && (
+        <div className="flex justify-center pt-2">
+          <button
+            type="button"
+            onClick={() => setIsExpanded(false)}
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-paper-600 dark:text-paper-400 hover:text-accent-500 dark:hover:text-accent-400 transition-colors cursor-pointer"
+          >
+            <ChevronUp className="w-4 h-4" />
+            <span>Ciutkan galeri</span>
+          </button>
+        </div>
+      )}
+
+      {/* Lightbox Modal / Popup Fullscreen */}
       {isOpen && selectedIndex !== null && (
         <div
           role="dialog"
@@ -96,7 +164,7 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
             <button
               type="button"
               onClick={handleClose}
-              className="p-2 text-white hover:text-accent-500 transition-colors bg-white/10 rounded-full"
+              className="p-2 text-white hover:text-accent-500 transition-colors bg-white/10 rounded-full cursor-pointer"
               aria-label="Tutup pratinjau"
             >
               <X className="w-5 h-5" />
@@ -112,7 +180,7 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
                   e.stopPropagation();
                   handlePrev();
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white hover:text-accent-500 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white hover:text-accent-500 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50 cursor-pointer"
                 aria-label="Foto sebelumnya"
               >
                 <ChevronLeft className="w-6 h-6" />
@@ -123,7 +191,7 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
                   e.stopPropagation();
                   handleNext();
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white hover:text-accent-500 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white hover:text-accent-500 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50 cursor-pointer"
                 aria-label="Foto berikutnya"
               >
                 <ChevronRight className="w-6 h-6" />
@@ -133,16 +201,15 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
 
           {/* Image & Caption */}
           <div
-            className="relative max-w-5xl max-h-[85vh] w-full flex flex-col items-center justify-center"
+            className="relative max-w-5xl max-h-[90vh] w-full flex flex-col items-center justify-center overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full h-[65vh] sm:h-[75vh]">
-              <Image
+            <div className="relative w-full max-h-[80vh] flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={items[selectedIndex].url}
                 alt={items[selectedIndex].caption || "Pratinjau galeri"}
-                fill
-                className="object-contain"
-                priority
+                className="max-h-[80vh] w-auto max-w-full object-contain rounded-lg shadow-2xl"
               />
             </div>
             {items[selectedIndex].caption && (
@@ -156,4 +223,3 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
     </div>
   );
 }
-
