@@ -10,14 +10,14 @@ import { sortProjects } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const rawFeaturedProjects = await prisma.project.findMany({
-    where: { status: "published", featured: true },
+  const rawProjects = await prisma.project.findMany({
+    where: { status: "published" },
     include: { category: true },
     orderBy: { createdAt: "desc" },
     take: 12,
   });
 
-  const featuredProjects = sortProjects(rawFeaturedProjects).slice(0, 6);
+  const featuredProjects = sortProjects(rawProjects).slice(0, 6);
 
   return (
     <>

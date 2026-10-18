@@ -173,11 +173,6 @@ export default async function AdminDashboardPage() {
                     <span className="font-medium text-sm text-paper-800 dark:text-paper-200 truncate">
                       {p.title}
                     </span>
-                    {p.featured && (
-                      <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-amber-500/20 text-[#F59E0B] rounded-full">
-                        ★
-                      </span>
-                    )}
                   </div>
                   <div className="text-xs text-paper-400 flex items-center gap-2 mt-0.5">
                     <span>{p.category?.name}</span>

@@ -110,16 +110,6 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
             </div>
           )}
 
-          {/* Floating Featured Badge */}
-          {project.featured && (
-            <div className="absolute top-3 right-3 z-10">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide bg-[#F59E0B] text-[#18181B] shadow-md shadow-amber-500/25">
-                <Sparkles className="w-2.5 h-2.5" />
-                Unggulan
-              </span>
-            </div>
-          )}
-
           {/* Hover Arrow */}
           <div className="absolute bottom-3 right-3 z-10 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-paper-900 dark:bg-paper-800 dark:text-paper-100 border border-paper-200 dark:border-paper-700 shadow-md">

@@ -50,7 +50,6 @@ export default async function AdminProjectsPage() {
               <th className="py-3 px-4">Judul & Slug</th>
               <th className="py-3 px-4">Kategori</th>
               <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Unggulan</th>
               <th className="py-3 px-4 text-right">Aksi</th>
             </tr>
           </thead>
@@ -88,13 +87,6 @@ export default async function AdminProjectsPage() {
                   >
                     {p.status}
                   </span>
-                </td>
-                <td className="py-3 px-4 font-mono">
-                  {p.featured ? (
-                    <span className="text-accent-500 font-bold">★ Ya</span>
-                  ) : (
-                    <span className="text-paper-400">-</span>
-                  )}
                 </td>
                 <td className="py-3 px-4 text-right">
                   <div className="flex items-center justify-end gap-2">
