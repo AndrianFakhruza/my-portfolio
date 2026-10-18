@@ -389,7 +389,7 @@ export function AdminProjectForm({
                   Galeri Gambar ({formData.gallery.length} Foto)
                 </h3>
                 <p className="text-[11px] text-paper-500 dark:text-paper-400 mt-0.5">
-                  Mendukung format JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 25MB per foto)
+                  Mendukung format JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 4MB per foto)
                 </p>
               </div>
               <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-paper-100 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-800 dark:text-paper-200 hover:border-accent-500 transition-colors">
@@ -463,7 +463,7 @@ export function AdminProjectForm({
                       Tarik dan lepaskan (drop) foto-foto ke sini, atau <span className="text-accent-500 underline">pilih sekaligus</span>
                     </p>
                     <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400 mt-1">
-                      Format: JPG, PNG, WebP, SVG, AVIF, GIF • Maksimal 25MB per file
+                      Format: JPG, PNG, WebP, SVG, AVIF, GIF • Maksimal 4MB per file
                     </p>
                   </div>
                 </div>
@@ -510,7 +510,7 @@ export function AdminProjectForm({
 
         {/* Right Column (Metadata, Sidebar) */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Status & Featured */}
+          {/* Status & Category */}
           <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
             <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300 pb-2 border-b border-paper-200 dark:border-paper-800">
               Publikasi & Visibilitas
@@ -595,7 +595,7 @@ export function AdminProjectForm({
                 />
               </label>
               <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400">
-                Format: JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 25MB)
+                Format: JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 4MB)
               </p>
             </div>
           </div>
