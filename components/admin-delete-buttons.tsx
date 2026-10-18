@@ -4,7 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
 
-export function DeleteProjectButton({ id, title }: { id: string; title: string }) {
+export function DeleteProjectButton({
+  id,
+  title,
+  onDeleted,
+}: {
+  id: string;
+  title: string;
+  onDeleted?: () => void;
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -16,6 +24,9 @@ export function DeleteProjectButton({ id, title }: { id: string; title: string }
       const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Gagal menghapus proyek");
+      if (onDeleted) {
+        onDeleted();
+      }
       router.refresh();
     } catch (err: any) {
       alert(err.message || "Gagal menghapus proyek.");
