@@ -12,7 +12,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const reason = searchParams.get("reason");
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
@@ -40,7 +40,7 @@ function LoginForm() {
       router.push(from);
       router.refresh();
     } catch (err: any) {
-      setError(err.message || "Email atau kata sandi tidak valid.");
+      setError(err.message || "Username atau kata sandi tidak valid.");
       setLoading(false);
     }
   };
@@ -115,15 +115,15 @@ function LoginForm() {
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold text-paper-700 dark:text-paper-300">
-            Alamat Email
+            Username
           </label>
           <input
-            type="email"
+            type="text"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-2.5 text-sm rounded-xl bg-white dark:bg-[#202024] border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-[#F59E0B] focus:ring-2 focus:ring-amber-500/15 text-paper-900 dark:text-paper-100 placeholder:text-paper-400 transition-all shadow-sm"
-            placeholder="email@domain.com"
+            placeholder="Masukkan username"
           />
         </div>
 
