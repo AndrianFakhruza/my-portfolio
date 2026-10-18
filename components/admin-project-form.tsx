@@ -129,6 +129,7 @@ export function AdminProjectForm({
   };
 
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number; filename: string } | null>(null);
 
   // Upload helper for multiple files (used by both input change & drag-and-drop)
   const uploadMultipleGalleryFiles = async (fileList: FileList | File[]) => {
@@ -136,9 +137,13 @@ export function AdminProjectForm({
     if (files.length === 0) return;
 
     setUploadingGallery(true);
-    let successCount = 0;
+    setUploadProgress({ current: 0, total: files.length, filename: files[0].name });
+
     try {
-      for (const file of files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setUploadProgress({ current: i + 1, total: files.length, filename: file.name });
+
         const data = new FormData();
         data.append("file", file);
 
@@ -159,12 +164,12 @@ export function AdminProjectForm({
           ...prev,
           gallery: [...prev.gallery, { url: resData.url, caption: "" }],
         }));
-        successCount++;
       }
     } catch (err: any) {
       alert(err.message || "Terjadi kesalahan saat mengunggah gambar galeri.");
     } finally {
       setUploadingGallery(false);
+      setUploadProgress(null);
     }
   };
 
@@ -400,7 +405,7 @@ export function AdminProjectForm({
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
+              className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 overflow-hidden ${
                 isDragging
                   ? "border-accent-500 bg-accent-500/10 scale-[1.01]"
                   : "border-paper-300 dark:border-paper-800 bg-paper-50/50 dark:bg-paper-950/40 hover:border-paper-400"
@@ -410,22 +415,54 @@ export function AdminProjectForm({
                 type="file"
                 multiple
                 accept="image/*"
+                disabled={uploadingGallery}
                 onChange={handleGalleryUpload}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
               />
-              <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
-                <div className="w-10 h-10 rounded-full bg-paper-100 dark:bg-paper-900 flex items-center justify-center text-paper-600 dark:text-paper-300">
-                  <ImagePlus className="w-5 h-5 text-accent-500" />
+
+              {uploadingGallery && uploadProgress ? (
+                /* Loading & Progress State */
+                <div className="flex flex-col items-center justify-center gap-3 py-2">
+                  <div className="relative flex items-center justify-center">
+                    <Loader2 className="w-9 h-9 animate-spin text-accent-500" />
+                  </div>
+                  <div className="space-y-1 max-w-xs mx-auto">
+                    <p className="text-xs font-bold text-paper-900 dark:text-paper-100 flex items-center justify-center gap-2 font-mono">
+                      <span>Mengunggah foto {uploadProgress.current} dari {uploadProgress.total}...</span>
+                    </p>
+                    <p className="text-[11px] text-paper-500 dark:text-paper-400 truncate max-w-[260px] mx-auto">
+                      {uploadProgress.filename}
+                    </p>
+                  </div>
+                  {/* Visual Progress Bar */}
+                  <div className="w-full max-w-xs bg-paper-200 dark:bg-paper-800 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-accent-500 h-2 rounded-full transition-all duration-300 ease-out"
+                      style={{
+                        width: `${Math.round((uploadProgress.current / uploadProgress.total) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-mono text-accent-500 font-semibold">
+                    {Math.round((uploadProgress.current / uploadProgress.total) * 100)}% selesai
+                  </span>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-paper-800 dark:text-paper-200">
-                    Tarik dan lepaskan (drop) foto-foto ke sini, atau <span className="text-accent-500 underline">pilih sekaligus</span>
-                  </p>
-                  <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400 mt-1">
-                    Format: JPG, PNG, WebP, SVG, AVIF, GIF • Maksimal 25MB per file
-                  </p>
+              ) : (
+                /* Default Dropzone State */
+                <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
+                  <div className="w-10 h-10 rounded-full bg-paper-100 dark:bg-paper-900 flex items-center justify-center text-paper-600 dark:text-paper-300">
+                    <ImagePlus className="w-5 h-5 text-accent-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-paper-800 dark:text-paper-200">
+                      Tarik dan lepaskan (drop) foto-foto ke sini, atau <span className="text-accent-500 underline">pilih sekaligus</span>
+                    </p>
+                    <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400 mt-1">
+                      Format: JPG, PNG, WebP, SVG, AVIF, GIF • Maksimal 25MB per file
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Grid Thumbnail Gambar Galeri */}
