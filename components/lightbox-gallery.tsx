@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight, Maximize2, ChevronDown, ChevronUp, Images } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Maximize2, ChevronDown, ChevronUp } from "lucide-react";
 
 interface GalleryItem {
   url: string;
@@ -16,8 +16,24 @@ interface LightboxGalleryProps {
 export function LightboxGallery({ items }: LightboxGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [needsCollapsing, setNeedsCollapsing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isOpen = selectedIndex !== null;
+
+  // Batas tinggi default galeri (misal 650px) sebelum ditekan "lihat lebih banyak"
+  const COLLAPSED_HEIGHT = 650;
+
+  useEffect(() => {
+    if (containerRef.current) {
+      // Cek apakah konten melebihi batas tinggi
+      if (containerRef.current.scrollHeight > COLLAPSED_HEIGHT + 80) {
+        setNeedsCollapsing(true);
+      } else {
+        setNeedsCollapsing(false);
+      }
+    }
+  }, [items]);
 
   const handlePrev = useCallback(() => {
     if (selectedIndex === null) return;
@@ -53,97 +69,75 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
 
   if (!items || items.length === 0) return null;
 
-  // Tampilkan max 3 item jika belum di-expand dan item lebih dari 2
-  const hasMoreThanTwo = items.length > 2;
-  const displayedItems = (!isExpanded && hasMoreThanTwo) ? items.slice(0, 3) : items;
-  const remainingCount = items.length - 2;
+  const showFade = needsCollapsing && !isExpanded;
 
   return (
-    <div className="space-y-4">
-      {/* Masonry / Pinterest Style Dynamic Flow Layout */}
-      <div className="columns-1 sm:columns-2 gap-4 sm:gap-6 [column-fill:_balance]">
-        {displayedItems.map((item, index) => {
-          const isThirdFadeItem = !isExpanded && hasMoreThanTwo && index === 2;
-
-          return (
-            <div
-              key={index}
-              className="break-inside-avoid mb-4 sm:mb-6"
-            >
+    <div className="relative">
+      {/* Container dengan batasan tinggi pixel & fade dinamis */}
+      <div
+        ref={containerRef}
+        style={{
+          maxHeight: isExpanded || !needsCollapsing ? "none" : `${COLLAPSED_HEIGHT}px`,
+        }}
+        className={`relative overflow-hidden transition-[max-height] duration-700 ease-in-out`}
+      >
+        {/* 4 Kolom di desktop (1 col mobile, 2 col tablet, 4 col desktop) */}
+        <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
+          {items.map((item, index) => (
+            <div key={index} className="break-inside-avoid mb-4 sm:mb-5">
               <figure
-                className={`group relative cursor-pointer rounded-2xl border border-paper-200/90 dark:border-paper-800/90 bg-white dark:bg-[#1f1f23] overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 ${
-                  isThirdFadeItem ? "max-h-[340px] pointer-events-none sm:pointer-events-auto" : ""
-                }`}
-                onClick={() => {
-                  if (isThirdFadeItem) {
-                    setIsExpanded(true);
-                  } else {
-                    setSelectedIndex(index);
-                  }
-                }}
+                className="group relative cursor-pointer rounded-xl border border-paper-200/90 dark:border-paper-800/90 bg-white dark:bg-[#1f1f23] overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+                onClick={() => setSelectedIndex(index)}
               >
                 {/* Natural aspect ratio image with full responsive height */}
                 <div className="relative w-full overflow-hidden bg-paper-100 dark:bg-paper-900/50">
                   <Image
                     src={item.url}
-                    alt={item.caption || `Galeri karya ${index + 1}`}
-                    width={1200}
-                    height={1600}
+                    alt={`Galeri karya ${index + 1}`}
+                    width={1000}
+                    height={1400}
                     className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                    sizes="(max-width: 640px) 100vw, 50vw"
-                    priority={index < 2}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    priority={index < 4}
                   />
 
                   {/* Hover Overlay preview icon */}
-                  {!isThirdFadeItem && (
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center pointer-events-none">
-                      <span className="p-2.5 rounded-full bg-white/95 dark:bg-paper-900/95 text-paper-900 dark:text-paper-100 opacity-0 group-hover:opacity-100 transition-all transform scale-75 group-hover:scale-100 duration-200 shadow-lg">
-                        <Maximize2 className="w-4 h-4" />
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Gradient Fade & Button Overlay untuk item ke-3 */}
-                  {isThirdFadeItem && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#18181B] dark:via-[#18181B]/85 dark:to-transparent flex flex-col items-center justify-end p-6 z-10 pointer-events-auto">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsExpanded(true);
-                        }}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-500 hover:bg-accent-600 text-white text-xs font-semibold uppercase tracking-wider shadow-lg shadow-accent-500/25 hover:shadow-accent-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-                      >
-                        <Images className="w-4 h-4" />
-                        <span>Lihat Semua ({items.length} Foto)</span>
-                        <ChevronDown className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center pointer-events-none">
+                    <span className="p-2.5 rounded-full bg-white/95 dark:bg-paper-900/95 text-paper-900 dark:text-paper-100 opacity-0 group-hover:opacity-100 transition-all transform scale-75 group-hover:scale-100 duration-200 shadow-lg">
+                      <Maximize2 className="w-4 h-4" />
+                    </span>
+                  </div>
                 </div>
-
-                {/* Optional Caption under card */}
-                {item.caption && !isThirdFadeItem && (
-                  <figcaption className="p-3 text-xs font-mono text-paper-600 dark:text-paper-400 border-t border-paper-100 dark:border-paper-800/60 bg-paper-50/50 dark:bg-paper-900/40">
-                    {item.caption}
-                  </figcaption>
-                )}
               </figure>
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* Gradien Fade di batas bawah ketika dicutkan */}
+        {showFade && (
+          <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-paper-50 via-paper-50/85 to-transparent dark:from-[#18181B] dark:via-[#18181B]/85 dark:to-transparent pointer-events-none" />
+        )}
       </div>
 
-      {/* Button Toggle Sembunyikan jika sudah di-expand */}
-      {isExpanded && hasMoreThanTwo && (
-        <div className="flex justify-center pt-2">
+      {/* Tombol Lihat Lebih Banyak / Ciutkan */}
+      {needsCollapsing && (
+        <div className="flex justify-center -mt-6 relative z-10 pt-4">
           <button
             type="button"
-            onClick={() => setIsExpanded(false)}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium text-paper-600 dark:text-paper-400 hover:text-accent-500 dark:hover:text-accent-400 transition-colors cursor-pointer"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-paper-900 dark:bg-white text-white dark:text-paper-900 hover:bg-accent-500 dark:hover:bg-accent-400 dark:hover:text-black font-semibold text-xs uppercase tracking-wider shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 cursor-pointer"
           >
-            <ChevronUp className="w-4 h-4" />
-            <span>Ciutkan galeri</span>
+            {isExpanded ? (
+              <>
+                <span>Ciutkan galeri</span>
+                <ChevronUp className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                <span>Lihat lebih banyak ({items.length} Gambar)</span>
+                <ChevronDown className="w-4 h-4 animate-bounce" />
+              </>
+            )}
           </button>
         </div>
       )}
@@ -199,24 +193,19 @@ export function LightboxGallery({ items }: LightboxGalleryProps) {
             </>
           )}
 
-          {/* Image & Caption */}
+          {/* Image */}
           <div
             className="relative max-w-5xl max-h-[90vh] w-full flex flex-col items-center justify-center overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full max-h-[80vh] flex items-center justify-center">
+            <div className="relative w-full max-h-[85vh] flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={items[selectedIndex].url}
-                alt={items[selectedIndex].caption || "Pratinjau galeri"}
-                className="max-h-[80vh] w-auto max-w-full object-contain rounded-lg shadow-2xl"
+                alt={`Pratinjau galeri ${selectedIndex + 1}`}
+                className="max-h-[85vh] w-auto max-w-full object-contain rounded-lg shadow-2xl"
               />
             </div>
-            {items[selectedIndex].caption && (
-              <p className="mt-4 text-center text-sm font-mono text-paper-300 max-w-2xl px-4">
-                {items[selectedIndex].caption}
-              </p>
-            )}
           </div>
         </div>
       )}

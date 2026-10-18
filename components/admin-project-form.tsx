@@ -14,6 +14,8 @@ import {
   ExternalLink,
   Eye,
   Edit3,
+  ImageIcon,
+  ImagePlus,
 } from "lucide-react";
 import { slugify } from "@/lib/utils";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -126,16 +128,17 @@ export function AdminProjectForm({
     }
   };
 
-  // Gallery image file upload handler
-  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  const [isDragging, setIsDragging] = useState(false);
 
-    const inputElement = e.target;
+  // Upload helper for multiple files (used by both input change & drag-and-drop)
+  const uploadMultipleGalleryFiles = async (fileList: FileList | File[]) => {
+    const files = Array.from(fileList);
+    if (files.length === 0) return;
+
     setUploadingGallery(true);
+    let successCount = 0;
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      for (const file of files) {
         const data = new FormData();
         data.append("file", file);
 
@@ -156,21 +159,44 @@ export function AdminProjectForm({
           ...prev,
           gallery: [...prev.gallery, { url: resData.url, caption: "" }],
         }));
+        successCount++;
       }
     } catch (err: any) {
       alert(err.message || "Terjadi kesalahan saat mengunggah gambar galeri.");
     } finally {
-      inputElement.value = "";
       setUploadingGallery(false);
     }
   };
 
-  const updateGalleryCaption = (index: number, caption: string) => {
-    setFormData((prev) => {
-      const nextGallery = [...prev.gallery];
-      nextGallery[index].caption = caption;
-      return { ...prev, gallery: nextGallery };
-    });
+  // Gallery file input handler
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const inputElement = e.target;
+    await uploadMultipleGalleryFiles(inputElement.files!);
+    inputElement.value = "";
+  };
+
+  // Drag and drop handlers for gallery
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      await uploadMultipleGalleryFiles(e.dataTransfer.files);
+    }
   };
 
   const removeGalleryItem = (index: number) => {
@@ -348,9 +374,14 @@ export function AdminProjectForm({
           {/* Gallery Manager */}
           <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
             <div className="flex items-center justify-between border-b border-paper-200 dark:border-paper-800 pb-3">
-              <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
-                Galeri Gambar ({formData.gallery.length} Foto)
-              </h3>
+              <div>
+                <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
+                  Galeri Gambar ({formData.gallery.length} Foto)
+                </h3>
+                <p className="text-[11px] text-paper-500 dark:text-paper-400 mt-0.5">
+                  Mendukung format JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 25MB per foto)
+                </p>
+              </div>
               <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-paper-100 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-800 dark:text-paper-200 hover:border-accent-500 transition-colors">
                 <Upload className="w-3 h-3" />
                 {uploadingGallery ? "Mengunggah..." : "Tambah Foto"}
@@ -364,33 +395,69 @@ export function AdminProjectForm({
               </label>
             </div>
 
-            <div className="space-y-4">
-              {formData.gallery.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 border border-paper-200 dark:border-paper-800 bg-paper-50 dark:bg-paper-900"
-                >
-                  <div className="relative w-20 h-14 shrink-0 bg-paper-200 dark:border-paper-800 overflow-hidden">
-                    <Image src={item.url} alt="Galeri" fill className="object-cover" />
-                  </div>
-                  <input
-                    type="text"
-                    value={item.caption}
-                    onChange={(e) => updateGalleryCaption(idx, e.target.value)}
-                    placeholder="Keterangan foto (opsional)..."
-                    className="flex-1 px-3 py-1.5 text-xs bg-card-bg border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeGalleryItem(idx)}
-                    className="p-1.5 text-rose-500 hover:text-rose-600"
-                    title="Hapus foto"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+            {/* Drag & Drop Multi-Image Zone */}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
+                isDragging
+                  ? "border-accent-500 bg-accent-500/10 scale-[1.01]"
+                  : "border-paper-300 dark:border-paper-800 bg-paper-50/50 dark:bg-paper-950/40 hover:border-paper-400"
+              }`}
+            >
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleGalleryUpload}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
+                <div className="w-10 h-10 rounded-full bg-paper-100 dark:bg-paper-900 flex items-center justify-center text-paper-600 dark:text-paper-300">
+                  <ImagePlus className="w-5 h-5 text-accent-500" />
                 </div>
-              ))}
-              {formData.gallery.length === 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-paper-800 dark:text-paper-200">
+                    Tarik dan lepaskan (drop) foto-foto ke sini, atau <span className="text-accent-500 underline">pilih sekaligus</span>
+                  </p>
+                  <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400 mt-1">
+                    Format: JPG, PNG, WebP, SVG, AVIF, GIF • Maksimal 25MB per file
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Grid Thumbnail Gambar Galeri */}
+            <div className="space-y-3">
+              {formData.gallery.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {formData.gallery.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="group relative aspect-[4/3] rounded-lg border border-paper-200 dark:border-paper-800 overflow-hidden bg-paper-100 dark:bg-paper-900 shadow-sm"
+                    >
+                      <Image
+                        src={item.url}
+                        alt={`Galeri item ${idx + 1}`}
+                        fill
+                        className="object-cover transition-transform group-hover:scale-105"
+                      />
+                      {/* Gradient overlay on hover with delete action */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryItem(idx)}
+                          className="p-2 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition-colors shadow-md cursor-pointer"
+                          title="Hapus foto ini"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
                 <p className="text-xs font-mono text-paper-500 text-center py-4">
                   Belum ada gambar dalam galeri.
                 </p>
@@ -436,18 +503,6 @@ export function AdminProjectForm({
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <label className="text-xs font-mono text-paper-700 dark:text-paper-300">
-                Tandai Sebagai Unggulan
-              </label>
-              <input
-                type="checkbox"
-                checked={formData.featured}
-                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                className="w-4 h-4 accent-accent-500"
-              />
             </div>
 
             <div className="space-y-1.5 pt-2">
@@ -497,6 +552,9 @@ export function AdminProjectForm({
                   className="hidden"
                 />
               </label>
+              <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400">
+                Format: JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 25MB)
+              </p>
             </div>
           </div>
 
