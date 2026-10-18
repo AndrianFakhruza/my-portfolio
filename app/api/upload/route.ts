@@ -53,6 +53,15 @@ export async function POST(request: Request) {
 
     const supabase = getSupabase();
 
+    // Pastikan bucket ada dan public (auto-create jika belum ada)
+    const { error: bucketError } = await supabase.storage.createBucket(BUCKET, {
+      public: true,
+      fileSizeLimit: 26214400,
+    });
+    if (bucketError && !bucketError.message.includes("already exists")) {
+      console.error("Bucket error:", bucketError.message);
+    }
+
     // Upload ke Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
