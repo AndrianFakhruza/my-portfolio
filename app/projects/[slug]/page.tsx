@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Github, Layers } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Github, Layers } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { extractHeadings, formatDate, calculateReadingTime } from "@/lib/utils";
 import { Navbar } from "@/components/navbar";
@@ -10,7 +10,6 @@ import { Footer } from "@/components/footer";
 import { LightboxGallery } from "@/components/lightbox-gallery";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { TableOfContents } from "@/components/table-of-contents";
-import { ProjectCard } from "@/components/project-card";
 
 export const dynamic = "force-dynamic";
 
@@ -154,24 +153,24 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
           )}
         </header>
 
-        {/* Compact Hero Cover Image */}
-        <div className="relative aspect-[21/9] sm:aspect-[2/1] w-full overflow-hidden rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card mb-7">
+        {/* Compact Hero Cover Image - Balanced Aspect Ratio */}
+        <div className="relative aspect-[16/9] sm:aspect-[21/9] max-h-[380px] sm:max-h-[420px] w-full overflow-hidden rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card mb-8">
           <Image
             src={project.cover}
             alt={project.title}
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 1024px"
-            className="object-cover"
+            className="object-cover object-top"
           />
         </div>
 
-        {/* Main Content (Medium-style Focused Layout with Sticky Subbab TOC) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* Main Reading Column */}
-          <article className="lg:col-span-8 min-w-0">
-            {/* Mobile TOC Accordion */}
-            {headings.length > 0 && (
+        {/* Main Content Layout */}
+        {headings.length > 0 ? (
+          /* Two-Column Layout with TOC Sidebar when headings exist */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+            {/* Main Reading Column */}
+            <article className="lg:col-span-8 min-w-0">
               <div className="lg:hidden mb-5">
                 <TableOfContents
                   headings={headings}
@@ -180,13 +179,11 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                   variant="mobile"
                 />
               </div>
-            )}
 
-            <MarkdownRenderer content={project.content} />
-          </article>
+              <MarkdownRenderer content={project.content} />
+            </article>
 
-          {/* Sticky Sidebar: Table of Contents / Subbab (Desktop) */}
-          {headings.length > 0 && (
+            {/* Sticky Sidebar: Table of Contents / Subbab (Desktop) */}
             <div className="hidden lg:block lg:col-span-4 sticky top-28">
               <TableOfContents
                 headings={headings}
@@ -195,8 +192,13 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                 variant="desktop"
               />
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* Focused Full-Width Reading Layout when there are no headings */
+          <article className="w-full min-w-0">
+            <MarkdownRenderer content={project.content} />
+          </article>
+        )}
 
         {/* Gallery Section */}
         {galleryItems.length > 0 && (
@@ -213,24 +215,67 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
           </section>
         )}
 
-        {/* Related Projects Section */}
+        {/* Related Projects Section - Sleek Compact Layout */}
         {relatedProjects.length > 0 && (
-          <section className="pt-6 sm:pt-8 pb-14 border-t border-paper-200/80 dark:border-paper-800/80 mt-6">
+          <section className="pt-8 pb-14 border-t border-paper-200/80 dark:border-paper-800/80 mt-10">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-paper-950 dark:text-paper-50">
-                Karya Terkait Lainnya
-              </h2>
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-accent-500 font-semibold block mb-0.5">
+                  Eksplorasi Lain
+                </span>
+                <h2 className="font-display text-base sm:text-lg font-bold tracking-tight text-paper-950 dark:text-paper-50">
+                  Karya Terkait Lainnya
+                </h2>
+              </div>
               <Link
                 href="/projects"
-                className="text-xs font-semibold text-accent-500 hover:text-accent-600 transition-colors"
+                className="text-xs font-semibold text-paper-500 hover:text-accent-500 transition-colors flex items-center gap-1 group"
               >
-                Lihat semua karya →
+                <span>Lihat semua karya</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {relatedProjects.map((p) => (
-                <ProjectCard key={p.id} project={p} layout="compact" />
-              ))}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {relatedProjects.map((p) => {
+                const categoryName = p.categories?.[0]?.name || "Proyek";
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/projects/${p.slug}`}
+                    className="group flex items-center gap-3.5 p-2.5 sm:p-3 rounded-xl border border-paper-200/80 dark:border-paper-800/80 bg-card-bg hover:border-accent-500/40 hover:bg-paper-50/60 dark:hover:bg-paper-900/40 transition-all duration-200 shadow-xs"
+                  >
+                    {/* Compact Mini Thumbnail */}
+                    <div className="relative w-20 h-14 sm:w-24 sm:h-16 rounded-lg overflow-hidden bg-paper-100 dark:bg-paper-800 shrink-0 border border-paper-200/60 dark:border-paper-700/60">
+                      <Image
+                        src={p.cover || "/placeholder-project.jpg"}
+                        alt={p.title}
+                        fill
+                        sizes="96px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+
+                    {/* Project Info */}
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-accent-500 font-semibold block truncate">
+                        {categoryName}
+                      </span>
+                      <h4 className="font-display text-xs sm:text-sm font-bold text-paper-900 dark:text-paper-100 truncate group-hover:text-accent-500 transition-colors">
+                        {p.title}
+                      </h4>
+                      <p className="text-[11px] text-paper-500 dark:text-paper-400 line-clamp-1 font-normal leading-normal">
+                        {p.summary}
+                      </p>
+                    </div>
+
+                    {/* Subtle Arrow */}
+                    <div className="p-1 rounded-md text-paper-400 group-hover:text-accent-500 group-hover:translate-x-0.5 transition-all shrink-0">
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </section>
         )}
