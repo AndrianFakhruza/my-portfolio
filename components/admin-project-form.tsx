@@ -93,33 +93,52 @@ export function AdminProjectForm({
     }));
   };
 
+  // Fungsi upload file langsung ke Supabase Storage (bypasses batas 4.5MB Vercel)
+  const uploadSingleFile = async (file: File): Promise<string> => {
+    // 1. Minta Signed URL ke backend Next.js kita
+    const signRes = await fetch("/api/upload", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fileName: file.name,
+        fileType: file.type,
+      }),
+    });
+
+    const signData = await signRes.json().catch(() => ({}));
+    if (!signRes.ok) {
+      if (signRes.status === 401) {
+        throw new Error("Sesi login Anda telah kedaluwarsa. Silakan refresh dan masuk kembali.");
+      }
+      throw new Error(signData.error || `Gagal mempersiapkan upload untuk ${file.name}`);
+    }
+
+    // 2. Upload file byte langsung ke Supabase Storage (mendukung hingga 25MB+)
+    const uploadRes = await fetch(signData.signedUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type || "image/jpeg",
+      },
+      body: file,
+    });
+
+    if (!uploadRes.ok) {
+      throw new Error(`Gagal mengirim file ke storage (Status ${uploadRes.status})`);
+    }
+
+    return signData.publicUrl;
+  };
+
   // Cover image file upload handler
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Reset input agar memilih file yang sama tetap memicu onChange
     const inputElement = e.target;
-
     setUploadingCover(true);
     try {
-      const data = new FormData();
-      data.append("file", file);
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: data,
-      });
-
-      const resData = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        if (res.status === 401) {
-          throw new Error("Sesi login admin Anda telah kedaluwarsa. Silakan refresh dan masuk kembali.");
-        }
-        throw new Error(resData.error || `Gagal mengunggah gambar (Status ${res.status})`);
-      }
-
-      setFormData((prev) => ({ ...prev, cover: resData.url }));
+      const publicUrl = await uploadSingleFile(file);
+      setFormData((prev) => ({ ...prev, cover: publicUrl }));
     } catch (err: any) {
       alert(err.message || "Gagal mengunggah gambar cover.");
     } finally {
@@ -144,25 +163,11 @@ export function AdminProjectForm({
         const file = files[i];
         setUploadProgress({ current: i + 1, total: files.length, filename: file.name });
 
-        const data = new FormData();
-        data.append("file", file);
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: data,
-        });
-
-        const resData = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          if (res.status === 401) {
-            throw new Error("Sesi login Anda telah kedaluwarsa. Silakan refresh dan masuk kembali.");
-          }
-          throw new Error(resData.error || `Gagal mengunggah ${file.name} (Status ${res.status})`);
-        }
+        const publicUrl = await uploadSingleFile(file);
 
         setFormData((prev) => ({
           ...prev,
-          gallery: [...prev.gallery, { url: resData.url, caption: "" }],
+          gallery: [...prev.gallery, { url: publicUrl, caption: "" }],
         }));
       }
     } catch (err: any) {

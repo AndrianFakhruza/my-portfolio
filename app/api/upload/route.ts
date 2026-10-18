@@ -11,6 +11,58 @@ function getSupabase() {
   return createClient(url, key);
 }
 
+// 1. Endpoint untuk membuat Signed Upload URL (Supabase Direct Upload)
+// Solusi ini bypass batas 4.5MB Vercel serverless request body!
+export async function PUT(request: Request) {
+  try {
+    const { fileName: originalName, fileType } = await request.json();
+
+    if (!originalName) {
+      return NextResponse.json({ error: "Nama file tidak valid" }, { status: 400 });
+    }
+
+    const ext = (path.extname(originalName) || "").toLowerCase();
+    const safeExt = ext || ".jpg";
+    const baseName = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, "-").toLowerCase();
+    const timestamp = Date.now();
+    const fileName = `${baseName || "image"}-${timestamp}${safeExt}`;
+
+    const supabase = getSupabase();
+
+    // Buat signed upload URL dari Supabase (berlaku 10 menit)
+    const { data, error } = await supabase.storage
+      .from(BUCKET)
+      .createSignedUploadUrl(fileName);
+
+    if (error || !data) {
+      console.error("Gagal membuat signed URL:", error);
+      return NextResponse.json(
+        { error: `Gagal mempersiapkan upload: ${error?.message || "Unknown error"}` },
+        { status: 500 }
+      );
+    }
+
+    // Ambil public URL yang akan digunakan setelah upload selesai
+    const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
+
+    return NextResponse.json({
+      success: true,
+      signedUrl: data.signedUrl,
+      token: data.token,
+      path: data.path,
+      fileName,
+      publicUrl: urlData.publicUrl,
+    });
+  } catch (error) {
+    console.error("Signed URL error:", error);
+    return NextResponse.json(
+      { error: "Gagal memproses permintaan upload" },
+      { status: 500 }
+    );
+  }
+}
+
+// 2. Standar POST upload (fallback jika dibutuhkan)
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
