@@ -69,8 +69,8 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
     <>
       <Navbar />
       <main className="flex-1 w-full max-w-5xl mx-auto px-5 sm:px-8">
-        {/* Compact Back nav */}
-        <div className="pt-24 sm:pt-28 pb-3">
+        {/* Compact Back nav + Live / GitHub Action Links */}
+        <div className="pt-24 sm:pt-28 pb-3 flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/projects"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-paper-500 hover:text-accent-500 transition-colors group"
@@ -78,6 +78,33 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
             <span>Kembali ke Koleksi Karya</span>
           </Link>
+
+          {(project.liveUrl || project.repoUrl) && (
+            <div className="flex items-center gap-2">
+              {project.liveUrl && (
+                <a
+                  href={project.liveUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-500 text-white hover:bg-accent-600 shadow-sm transition-colors"
+                >
+                  <span>Live Demo</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+              {project.repoUrl && (
+                <a
+                  href={project.repoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-paper-100 dark:bg-paper-800 border border-paper-200 dark:border-paper-700 text-paper-700 dark:text-paper-300 hover:text-accent-500 transition-colors"
+                >
+                  <Github className="w-3 h-3" />
+                  <span>Kode</span>
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Compact Header */}
@@ -112,48 +139,17 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             {project.summary}
           </p>
 
-          {(toolsList.length > 0 || project.liveUrl || project.repoUrl) && (
-            <div className="pt-1 flex flex-wrap items-center justify-between gap-3 text-xs">
-              {toolsList.length > 0 && (
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-paper-400 font-medium">Alat:</span>
-                  {toolsList.map((tool) => (
-                    <span
-                      key={tool}
-                      className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-paper-100 dark:bg-paper-800/80 border border-paper-200/70 dark:border-paper-700/60 text-paper-700 dark:text-paper-300"
-                    >
-                      {tool}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {(project.liveUrl || project.repoUrl) && (
-                <div className="flex items-center gap-2">
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-accent-500 text-white hover:bg-accent-600 shadow-sm transition-colors"
-                    >
-                      <span>Live Demo</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  )}
-                  {project.repoUrl && (
-                    <a
-                      href={project.repoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-paper-100 dark:bg-paper-800 border border-paper-200 dark:border-paper-700 text-paper-700 dark:text-paper-300 hover:text-accent-500 transition-colors"
-                    >
-                      <Github className="w-3 h-3" />
-                      <span>Kode</span>
-                    </a>
-                  )}
-                </div>
-              )}
+          {toolsList.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap pt-1 text-xs">
+              <span className="text-paper-400 font-medium">Alat:</span>
+              {toolsList.map((tool) => (
+                <span
+                  key={tool}
+                  className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-paper-100 dark:bg-paper-800/80 border border-paper-200/70 dark:border-paper-700/60 text-paper-700 dark:text-paper-300"
+                >
+                  {tool}
+                </span>
+              ))}
             </div>
           )}
         </header>
