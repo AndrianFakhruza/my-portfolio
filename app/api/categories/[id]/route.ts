@@ -67,11 +67,16 @@ export async function DELETE(
 
     // Gunakan prisma transaction agar atomik dan konsisten
     await prisma.$transaction(async (tx) => {
-      if (category.projects.length > 0) {
-        await tx.project.deleteMany({
-          where: { categoryId: id },
-        });
-      }
+      await tx.category.update({
+        where: { id },
+        data: {
+          projects: { set: [] },
+        },
+      });
+      await tx.project.updateMany({
+        where: { categoryId: id },
+        data: { categoryId: null },
+      });
       await tx.category.delete({
         where: { id },
       });
@@ -79,7 +84,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      deletedProjects: category.projects.length,
+      affectedProjects: category.projects.length,
     });
   } catch (error: any) {
     console.error("Category DELETE error:", error?.message ?? error);

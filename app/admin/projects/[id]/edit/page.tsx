@@ -14,6 +14,7 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
   const [project, categories] = await Promise.all([
     prisma.project.findUnique({
       where: { id },
+      include: { categories: true },
     }),
     prisma.category.findMany({
       orderBy: { name: "asc" },
@@ -31,13 +32,21 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
     galleryItems = [];
   }
 
+  const categoryIds =
+    project.categories && project.categories.length > 0
+      ? project.categories.map((c) => c.id)
+      : project.categoryId
+      ? [project.categoryId]
+      : [];
+
   const initialData = {
     id: project.id,
     title: project.title,
     slug: project.slug,
     summary: project.summary,
     content: project.content,
-    categoryId: project.categoryId,
+    categoryIds,
+    categoryId: project.categoryId || categoryIds[0] || "",
     tags: project.tags,
     cover: project.cover,
     gallery: galleryItems,

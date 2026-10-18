@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminProjectsPage() {
   const rawProjects = await prisma.project.findMany({
-    include: { category: true },
+    include: { categories: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -73,9 +73,16 @@ export default async function AdminProjectsPage() {
                   </div>
                 </td>
                 <td className="py-3 px-4 font-mono text-paper-600 dark:text-paper-400">
-                  <span className="px-2 py-0.5 rounded bg-paper-100 dark:bg-paper-900 border border-paper-200 dark:border-paper-800">
-                    {p.category?.name}
-                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {(p.categories || []).map((cat) => (
+                      <span
+                        key={cat.id}
+                        className="px-2 py-0.5 rounded bg-paper-100 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-[11px]"
+                      >
+                        {cat.name}
+                      </span>
+                    ))}
+                  </div>
                 </td>
                 <td className="py-3 px-4 font-mono">
                   <span

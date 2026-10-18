@@ -28,18 +28,18 @@ model Category {
 }
 
 model Project {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   title       String
-  slug        String   @unique
-  summary     String   @db.Text
-  content     String   @db.Text // Full Markdown Case Study: Masalah, Proses, Hasil
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  tags        String   // comma separated: "Design System, Next.js, Fintech"
-  cover       String   @db.Text // Image URL or local path
-  gallery     String   @db.Text // JSON string of gallery images [{url, caption}]
-  role        String   // e.g. "Lead Product Designer & Frontend Dev"
-  tools       String   // e.g. "Figma, React, Tailwind CSS, TypeScript"
+  slug        String     @unique
+  summary     String     @db.Text
+  content     String     @db.Text // Full Markdown Case Study: Masalah, Proses, Hasil
+  categories  Category[]
+  categoryId  String?
+  tags        String     // comma separated: "Design System, Next.js, Fintech"
+  cover       String     @db.Text // Image URL or local path
+  gallery     String     @db.Text // JSON string of gallery images [{url, caption}]
+  role        String     // e.g. "Lead Product Designer & Frontend Dev"
+  tools       String     // e.g. "Figma, React, Tailwind CSS, TypeScript"
   liveUrl     String?  @db.Text // https://...
   repoUrl     String?  @db.Text // https://github.com/...
   featured    Boolean  @default(false)

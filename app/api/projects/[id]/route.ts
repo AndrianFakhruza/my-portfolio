@@ -14,7 +14,7 @@ export async function GET(
         OR: [{ id }, { slug: id }],
       },
       include: {
-        category: true,
+        categories: true,
       },
     });
 
@@ -54,6 +54,21 @@ export async function PUT(
       }
     }
 
+    let updateCategoriesObj: any = undefined;
+    let newCategoryId: string | undefined = undefined;
+
+    if (Array.isArray(data.categoryIds) && data.categoryIds.length > 0) {
+      updateCategoriesObj = {
+        set: data.categoryIds.map((catId: string) => ({ id: catId })),
+      };
+      newCategoryId = data.categoryIds[0];
+    } else if (data.categoryId) {
+      updateCategoriesObj = {
+        set: [{ id: data.categoryId }],
+      };
+      newCategoryId = data.categoryId;
+    }
+
     const updated = await prisma.project.update({
       where: { id },
       data: {
@@ -61,7 +76,8 @@ export async function PUT(
         slug,
         summary: data.summary !== undefined ? data.summary.trim() : existing.summary,
         content: data.content !== undefined ? data.content : existing.content,
-        categoryId: data.categoryId || existing.categoryId,
+        categoryId: newCategoryId || existing.categoryId,
+        categories: updateCategoriesObj,
         tags: data.tags !== undefined ? data.tags : existing.tags,
         cover: data.cover || existing.cover,
         gallery: typeof data.gallery === "string" ? data.gallery : JSON.stringify(data.gallery || []),
@@ -74,7 +90,7 @@ export async function PUT(
         order: data.order !== undefined ? Number(data.order) : existing.order,
       },
       include: {
-        category: true,
+        categories: true,
       },
     });
 

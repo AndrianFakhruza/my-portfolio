@@ -30,7 +30,7 @@ export default async function AdminDashboardPage() {
     prisma.category.count(),
     prisma.message.count({ where: { isRead: false } }),
     prisma.project.findMany({
-      include: { category: true },
+      include: { categories: true },
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
@@ -175,7 +175,9 @@ export default async function AdminDashboardPage() {
                     </span>
                   </div>
                   <div className="text-xs text-paper-400 flex items-center gap-2 mt-0.5">
-                    <span>{p.category?.name}</span>
+                    <span>
+                      {p.categories?.map((c) => c.name).join(", ") || "-"}
+                    </span>
                     <span>·</span>
                     <span className={p.status === "published" ? "text-amber-600 dark:text-[#F59E0B] font-medium" : "text-paper-400"}>
                       {p.status === "published" ? "Publik" : "Draft"}

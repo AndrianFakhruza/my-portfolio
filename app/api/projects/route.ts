@@ -22,9 +22,10 @@ export async function GET(request: Request) {
     }
 
     if (categorySlug && categorySlug !== "all") {
-      where.category = {
-        slug: categorySlug,
-      };
+      where.OR = [
+        { categories: { some: { slug: categorySlug } } },
+        { categoryId: (await prisma.category.findUnique({ where: { slug: categorySlug } }))?.id || "" },
+      ];
     }
 
     if (search) {
@@ -38,7 +39,7 @@ export async function GET(request: Request) {
     const rawProjects = await prisma.project.findMany({
       where,
       include: {
-        category: true,
+        categories: true,
       },
       orderBy: { createdAt: "desc" },
     });
@@ -56,9 +57,16 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
-    if (!data.title || !data.categoryId || !data.summary) {
+    const categoryIds: string[] =
+      Array.isArray(data.categoryIds) && data.categoryIds.length > 0
+        ? data.categoryIds
+        : data.categoryId
+        ? [data.categoryId]
+        : [];
+
+    if (!data.title || categoryIds.length === 0 || !data.summary) {
       return NextResponse.json(
-        { error: "Judul, kategori, dan ringkasan wajib diisi" },
+        { error: "Judul, minimal satu kategori, dan ringkasan wajib diisi" },
         { status: 400 }
       );
     }
@@ -76,7 +84,10 @@ export async function POST(request: Request) {
         slug,
         summary: data.summary.trim(),
         content: data.content || "",
-        categoryId: data.categoryId,
+        categoryId: categoryIds[0] || null,
+        categories: {
+          connect: categoryIds.map((id) => ({ id })),
+        },
         tags: data.tags || "",
         cover: data.cover || "/placeholder-project.jpg",
         gallery: typeof data.gallery === "string" ? data.gallery : JSON.stringify(data.gallery || []),
@@ -89,7 +100,7 @@ export async function POST(request: Request) {
         order: Number(data.order) || 0,
       },
       include: {
-        category: true,
+        categories: true,
       },
     });
 

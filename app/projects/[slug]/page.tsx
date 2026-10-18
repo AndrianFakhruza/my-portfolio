@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: ProjectDetailProps): Promise<
   const { slug } = await params;
   const project = await prisma.project.findUnique({
     where: { slug },
-    include: { category: true },
+    include: { categories: true },
   });
 
   if (!project) return { title: "Proyek Tidak Ditemukan" };
@@ -43,7 +43,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
 
   const project = await prisma.project.findUnique({
     where: { slug },
-    include: { category: true },
+    include: { categories: true },
   });
 
   if (!project) notFound();
@@ -57,7 +57,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
 
   const relatedProjects = await prisma.project.findMany({
     where: { status: "published", id: { not: project.id } },
-    include: { category: true },
+    include: { categories: true },
     orderBy: { createdAt: "desc" },
     take: 2,
   });
@@ -83,12 +83,15 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         {/* Compact Header */}
         <header className="space-y-2.5 pb-4">
           <div className="flex flex-wrap items-center gap-2">
-            {project.category && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-accent-500/10 text-accent-500 border border-accent-500/20">
+            {(project.categories || []).map((cat) => (
+              <span
+                key={cat.id}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-accent-500/10 text-accent-500 border border-accent-500/20"
+              >
                 <Layers className="w-3 h-3" />
-                {project.category.name}
+                {cat.name}
               </span>
-            )}
+            ))}
             {project.createdAt && (
               <span className="text-[11px] text-paper-400 font-medium">
                 · {formatDate(project.createdAt)}
@@ -113,12 +116,6 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         {/* Compact Quick Spec & Action Bar */}
         <div className="py-2.5 px-4 rounded-xl border border-paper-200/80 dark:border-paper-800/80 bg-card-bg shadow-soft flex flex-wrap items-center justify-between gap-3 text-xs mb-5">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
-            {project.role && (
-              <div>
-                <span className="text-paper-400 font-medium">Peran: </span>
-                <span className="font-semibold text-paper-800 dark:text-paper-200">{project.role}</span>
-              </div>
-            )}
             {toolsList.length > 0 && (
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-paper-400 font-medium">Alat: </span>

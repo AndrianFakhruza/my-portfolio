@@ -38,7 +38,8 @@ interface ProjectData {
   slug: string;
   summary: string;
   content: string;
-  categoryId: string;
+  categoryIds: string[];
+  categoryId?: string;
   cover: string;
   gallery: GalleryItem[];
   tools: string;
@@ -67,6 +68,14 @@ export function AdminProjectForm({
     slug: initialData?.slug || "",
     summary: initialData?.summary || "",
     content: initialData?.content || "",
+    categoryIds:
+      initialData?.categoryIds && initialData.categoryIds.length > 0
+        ? initialData.categoryIds
+        : initialData?.categoryId
+        ? [initialData.categoryId]
+        : categories[0]?.id
+        ? [categories[0].id]
+        : [],
     categoryId: initialData?.categoryId || (categories[0]?.id || ""),
     cover: initialData?.cover || "",
     gallery: initialData?.gallery || [],
@@ -222,6 +231,10 @@ export function AdminProjectForm({
     setLoading(true);
 
     try {
+      if (formData.categoryIds.length === 0) {
+        throw new Error("Pilih minimal satu kategori proyek");
+      }
+
       const url = isEditing
         ? `/api/projects/${initialData?.id}`
         : "/api/projects";
@@ -530,21 +543,51 @@ export function AdminProjectForm({
               </select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Kategori Proyek <span className="text-accent-500">*</span>
-              </label>
-              <select
-                value={formData.categoryId}
-                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                className="w-full px-3 py-2 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              >
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name} ({cat.type})
-                  </option>
-                ))}
-              </select>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
+                  Kategori Proyek <span className="text-accent-500">*</span>
+                </label>
+                <span className="text-[10px] font-mono text-paper-400">
+                  {formData.categoryIds.length} dipilih
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2 p-3 border border-paper-200 dark:border-paper-800 bg-paper-50/60 dark:bg-paper-900/60 rounded-lg">
+                {categories.map((cat) => {
+                  const isSelected = formData.categoryIds.includes(cat.id);
+                  return (
+                    <button
+                      type="button"
+                      key={cat.id}
+                      onClick={() => {
+                        setFormData((prev) => {
+                          const exists = prev.categoryIds.includes(cat.id);
+                          const nextIds = exists
+                            ? prev.categoryIds.filter((id) => id !== cat.id)
+                            : [...prev.categoryIds, cat.id];
+                          return {
+                            ...prev,
+                            categoryIds: nextIds,
+                            categoryId: nextIds[0] || "",
+                          };
+                        });
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                        isSelected
+                          ? "bg-accent-500 text-white shadow-sm ring-1 ring-accent-500"
+                          : "bg-card-bg text-paper-700 dark:text-paper-300 border border-paper-200 dark:border-paper-800 hover:border-accent-500/50"
+                      }`}
+                    >
+                      <span>{cat.name}</span>
+                      <span className="text-[10px] opacity-75 font-mono">({cat.type})</span>
+                      {isSelected && <span className="text-xs font-bold ml-0.5">✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-paper-500 dark:text-paper-400">
+                Klik pada kategori untuk memilih atau membatalkan pilihan (bisa pilih lebih dari satu).
+              </p>
             </div>
 
             <div className="space-y-1.5 pt-2">

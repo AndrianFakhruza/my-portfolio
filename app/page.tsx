@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const rawProjects = await prisma.project.findMany({
     where: { status: "published" },
-    include: { category: true },
+    include: { categories: true },
     orderBy: { createdAt: "desc" },
     take: 12,
   });

@@ -17,7 +17,7 @@ export default async function ProjectsPage() {
   const [rawProjects, categories] = await Promise.all([
     prisma.project.findMany({
       where: { status: "published" },
-      include: { category: true },
+      include: { categories: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.category.findMany({

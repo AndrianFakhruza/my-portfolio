@@ -19,8 +19,8 @@ interface Project {
   cover: string;
   featured: boolean;
   category?: Category | null;
+  categories?: Category[];
   tools?: string;
-  role?: string;
 }
 
 interface ProjectsViewProps {
@@ -36,6 +36,7 @@ export function ProjectsView({ initialProjects, categories }: ProjectsViewProps)
     return initialProjects.filter((project) => {
       const matchesCategory =
         selectedCategory === "all" ||
+        (project.categories && project.categories.some((c: any) => c.slug === selectedCategory)) ||
         project.category?.slug === selectedCategory;
 
       const q = searchQuery.toLowerCase().trim();
@@ -44,6 +45,7 @@ export function ProjectsView({ initialProjects, categories }: ProjectsViewProps)
         project.title.toLowerCase().includes(q) ||
         project.summary.toLowerCase().includes(q) ||
         project.category?.name?.toLowerCase().includes(q) ||
+        (project.categories && project.categories.some((c: any) => c.name?.toLowerCase().includes(q))) ||
         (project.tools && project.tools.toLowerCase().includes(q));
 
       return matchesCategory && matchesSearch;
@@ -69,7 +71,11 @@ export function ProjectsView({ initialProjects, categories }: ProjectsViewProps)
             Semua ({initialProjects.length})
           </button>
           {categories.map((cat) => {
-            const count = initialProjects.filter((p) => p.category?.slug === cat.slug).length;
+            const count = initialProjects.filter(
+              (p) =>
+                p.categories?.some((c: any) => c.slug === cat.slug) ||
+                p.category?.slug === cat.slug
+            ).length;
             return (
               <button
                 key={cat.id}

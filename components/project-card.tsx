@@ -11,12 +11,15 @@ interface ProjectCardProps {
     slug: string;
     summary: string;
     cover: string;
-    role?: string;
     tools?: string;
     category?: {
       name: string;
       slug: string;
     };
+    categories?: {
+      name: string;
+      slug: string;
+    }[];
     featured?: boolean;
   };
   layout?: "asymmetric" | "standard" | "compact";
@@ -25,6 +28,12 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, layout = "standard", index = 0 }: ProjectCardProps) {
   const toolsList = project.tools ? project.tools.split(",").map((t) => t.trim()).slice(0, 3) : [];
+  const categoriesList =
+    project.categories && project.categories.length > 0
+      ? project.categories
+      : project.category
+      ? [project.category]
+      : [];
 
   if (layout === "compact") {
     return (
@@ -44,12 +53,17 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
 
-            {/* Floating Category Pill */}
-            {project.category && (
-              <div className="absolute top-2 left-2 z-10">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-medium tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/15 shadow-sm">
-                  {project.category.name}
-                </span>
+            {/* Floating Category Pills */}
+            {categoriesList.length > 0 && (
+              <div className="absolute top-2 left-2 z-10 flex flex-wrap gap-1 max-w-[85%]">
+                {categoriesList.map((cat) => (
+                  <span
+                    key={cat.slug}
+                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-medium tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/15 shadow-sm"
+                  >
+                    {cat.name}
+                  </span>
+                ))}
               </div>
             )}
           </Link>
@@ -68,10 +82,7 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
         </div>
 
         {/* Compact Footer */}
-        <div className="px-3 pb-3 sm:px-3.5 sm:pb-3.5 pt-0 flex items-center justify-between text-[11px] border-t border-paper-100 dark:border-paper-900/60 mt-1 pt-2.5">
-          <span className="text-paper-400 truncate max-w-[130px]">
-            {project.role || "Product Designer"}
-          </span>
+        <div className="px-3 pb-3 sm:px-3.5 sm:pb-3.5 pt-0 flex items-center justify-end text-[11px] border-t border-paper-100 dark:border-paper-900/60 mt-1 pt-2.5">
           <Link
             href={`/projects/${project.slug}`}
             className="inline-flex items-center gap-1 font-semibold text-accent-500 hover:text-accent-600 transition-colors"
@@ -101,12 +112,17 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent opacity-50 group-hover:opacity-30 transition-opacity duration-300" />
 
-          {/* Floating Category Pill on top left */}
-          {project.category && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/15 shadow-sm">
-                {project.category.name}
-              </span>
+          {/* Floating Category Pills on top left */}
+          {categoriesList.length > 0 && (
+            <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 max-w-[80%]">
+              {categoriesList.map((cat) => (
+                <span
+                  key={cat.slug}
+                  className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/15 shadow-sm"
+                >
+                  {cat.name}
+                </span>
+              ))}
             </div>
           )}
 
@@ -132,24 +148,18 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
       </div>
 
       {/* Meta Footer */}
-      <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 flex flex-wrap items-center justify-between gap-2 text-xs border-t border-paper-100 dark:border-paper-900/60 mt-1 pt-3">
-        <span className="text-[11px] font-medium text-paper-500 dark:text-paper-400 truncate max-w-[120px]">
-          {project.role || "Product Designer"}
-        </span>
-
-        {toolsList.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1">
-            {toolsList.map((tool) => (
-              <span
-                key={tool}
-                className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-paper-100 dark:bg-paper-900 text-paper-500 dark:text-paper-400 border border-paper-200/50 dark:border-paper-800/50"
-              >
-                {tool}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
+      {toolsList.length > 0 && (
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0 flex flex-wrap items-center gap-1.5 text-xs border-t border-paper-100 dark:border-paper-900/60 mt-1 pt-3">
+          {toolsList.map((tool) => (
+            <span
+              key={tool}
+              className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-paper-100 dark:bg-paper-900 text-paper-500 dark:text-paper-400 border border-paper-200/50 dark:border-paper-800/50"
+            >
+              {tool}
+            </span>
+          ))}
+        </div>
+      )}
     </article>
   );
 }

@@ -129,13 +129,6 @@ export function AdminMessagesView({ initialMessages }: { initialMessages: Messag
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-end gap-2">
-                      <a
-                        href={`mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || "Diskusi Portofolio Andrian")}`}
-                        className="p-1.5 text-paper-600 dark:text-paper-400 hover:text-accent-500 transition-colors"
-                        title="Balas via Email"
-                      >
-                        <Send className="w-3.5 h-3.5" />
-                      </a>
                       <button
                         type="button"
                         onClick={() => toggleReadStatus(msg)}
@@ -214,15 +207,6 @@ export function AdminMessagesView({ initialMessages }: { initialMessages: Messag
               >
                 {selectedMessage.isRead ? "Tandai Belum Dibaca" : "Tandai Sudah Dibaca"}
               </button>
-              <div className="flex items-center gap-3">
-                <a
-                  href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject || "Diskusi Portofolio Andrian")}`}
-                  className="inline-flex items-center gap-2 px-5 py-2 text-xs font-mono uppercase tracking-wider bg-accent-500 hover:bg-accent-600 text-white font-bold"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  Balas via Email
-                </a>
-              </div>
             </div>
           </div>
         </div>
