@@ -146,7 +146,10 @@ export function AdminProjectForm({
 
         const resData = await res.json().catch(() => ({}));
         if (!res.ok) {
-          throw new Error(resData.error || `Gagal mengunggah ${file.name}`);
+          if (res.status === 401) {
+            throw new Error("Sesi login Anda telah kedaluwarsa. Silakan refresh dan masuk kembali.");
+          }
+          throw new Error(resData.error || `Gagal mengunggah ${file.name} (Status ${res.status})`);
         }
 
         setFormData((prev) => ({
