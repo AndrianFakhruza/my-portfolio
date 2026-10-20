@@ -1,9 +1,9 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -37,30 +37,41 @@ const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const isLoggingOutRef = useRef(false);
 
   const handleLogout = useCallback(
     async (reason?: string) => {
+      if (isLoggingOutRef.current) return;
+      isLoggingOutRef.current = true;
+      setLoggingOut(true);
+
+      const target = reason ? `/admin/login?reason=${reason}` : "/admin/login";
+
+      // Fallback timer: navigasi paksa jika ada hambatan dalam 1.2 detik
+      const fallbackTimer = setTimeout(() => {
+        window.location.href = target;
+      }, 1200);
+
       try {
-        setLoggingOut(true);
         if (typeof window !== "undefined") {
           localStorage.removeItem("admin_last_activity");
         }
-        await fetch("/api/auth/logout", { method: "POST" });
-        // Beri waktu animasi fade-out berjalan (500ms) sebelum redirect
-        await new Promise((resolve) => setTimeout(resolve, 450));
-        const target = reason ? `/admin/login?reason=${reason}` : "/admin/login";
-        router.push(target);
-        router.refresh();
+        await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+        // Beri jeda singkat untuk transisi animasi fade-out
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        clearTimeout(fallbackTimer);
+        window.location.href = target;
       } catch (e) {
         console.error("Logout error", e);
-        setLoggingOut(false);
+        clearTimeout(fallbackTimer);
+        window.location.href = target;
       }
     },
-    [router]
+    []
   );
 
   // Inactivity tracking (Auto-logout jika tidak ada aktivitas selama 30 menit)
@@ -71,17 +82,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       localStorage.setItem("admin_last_activity", Date.now().toString());
     };
 
-    if (!localStorage.getItem("admin_last_activity")) {
-      updateActivity();
-    }
+    // PENTING: Selalu set waktu aktivitas terbaru saat halaman admin aktif dimuat
+    updateActivity();
 
     const checkInactivity = () => {
+      if (isLoggingOutRef.current) return;
       const last = localStorage.getItem("admin_last_activity");
       if (last) {
         const elapsed = Date.now() - parseInt(last, 10);
         if (elapsed > INACTIVITY_TIMEOUT_MS) {
           handleLogout("inactive");
         }
+      } else {
+        updateActivity();
       }
     };
 

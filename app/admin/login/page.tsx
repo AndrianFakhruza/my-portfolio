@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Lock, ArrowLeft, Loader2, AlertCircle, Eye, EyeOff, Clock, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function LoginForm() {
-  const router = useRouter();
+
   const searchParams = useSearchParams();
   const reason = searchParams.get("reason");
 
@@ -35,10 +35,13 @@ function LoginForm() {
 
       // Tampilkan animasi sukses, lalu redirect setelah 750ms
       setLoginSuccess(true);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("admin_last_activity", Date.now().toString());
+      }
       const from = searchParams.get("from") || "/admin";
       await new Promise((resolve) => setTimeout(resolve, 700));
-      router.push(from);
-      router.refresh();
+      window.location.href = from;
+
     } catch (err: any) {
       setError(err.message || "Username atau kata sandi tidak valid.");
       setLoading(false);
