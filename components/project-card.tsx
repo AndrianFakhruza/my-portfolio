@@ -5,6 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, ArrowRight, Sparkles, Github, Globe, X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 
+function formatExternalUrl(url?: string | null): string {
+  if (!url) return "";
+  const trimmed = url.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+}
+
 interface ProjectCardProps {
   project: {
     id: string;
@@ -149,6 +159,9 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
   const firstCategory = categoriesList[0];
   const extraCategoriesCount = categoriesList.length - 1;
 
+  const repoHref = formatExternalUrl(project.repoUrl);
+  const liveHref = formatExternalUrl(project.liveUrl);
+
   if (layout === "compact") {
     // ---- GALLERY COMPACT CARD ----
     if (isGallery) {
@@ -239,22 +252,25 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
       <article className="group relative flex flex-col justify-between rounded-xl border border-paper-200/80 dark:border-paper-800/80 bg-card-bg shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all duration-300 overflow-hidden">
         <div>
           {/* Media Preview Box - Compact 16:9 */}
-          <Link
-            href={`/projects/${project.slug}`}
-            className="relative block aspect-[16/9] w-full overflow-hidden bg-paper-100 dark:bg-paper-900"
-          >
-            <Image
-              src={project.cover || "/placeholder-project.jpg"}
-              alt={project.title}
-              fill
-              sizes="(max-width: 640px) 100vw, 50vw"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
+          <div className="relative aspect-[16/9] w-full overflow-hidden bg-paper-100 dark:bg-paper-900">
+            <Link
+              href={`/projects/${project.slug}`}
+              className="absolute inset-0 block w-full h-full"
+              aria-label={project.title}
+            >
+              <Image
+                src={project.cover || "/placeholder-project.jpg"}
+                alt={project.title}
+                fill
+                sizes="(max-width: 640px) 100vw, 50vw"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
+            </Link>
 
             {/* Floating Category Pills */}
             {firstCategory && (
-              <div className="absolute top-2 left-2 z-10 flex items-center gap-1 max-w-[70%]">
+              <div className="absolute top-2 left-2 z-10 flex items-center gap-1 max-w-[70%] pointer-events-none">
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-medium tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/15 shadow-sm">
                   {firstCategory.name}
                 </span>
@@ -267,35 +283,35 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
             )}
 
             {/* GitHub & Live URL Buttons - top right */}
-            {(project.repoUrl || project.liveUrl) && (
-              <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5">
-                {project.repoUrl && (
+            {(repoHref || liveHref) && (
+              <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                {repoHref && (
                   <a
-                    href={project.repoUrl}
+                    href={repoHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(project.repoUrl!, "_blank"); }}
-                    className="w-7 h-7 rounded-md bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-accent-500 transition-colors"
-                    title="Lihat Repositori GitHub"
+                    className="w-7 h-7 rounded-md bg-black/70 hover:bg-accent-500 text-white flex items-center justify-center backdrop-blur-sm transition-all duration-200 shadow-sm hover:scale-110 active:scale-95"
+                    title="Buka Repositori GitHub"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <Github className="w-3.5 h-3.5" />
                   </a>
                 )}
-                {project.liveUrl && (
+                {liveHref && (
                   <a
-                    href={project.liveUrl}
+                    href={liveHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(project.liveUrl!, "_blank"); }}
-                    className="w-7 h-7 rounded-md bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-accent-500 transition-colors"
+                    className="w-7 h-7 rounded-md bg-black/70 hover:bg-accent-500 text-white flex items-center justify-center backdrop-blur-sm transition-all duration-200 shadow-sm hover:scale-110 active:scale-95"
                     title="Buka Live Demo"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <Globe className="w-3.5 h-3.5" />
                   </a>
                 )}
               </div>
             )}
-          </Link>
+          </div>
 
           {/* Content Body - Compact */}
           <div className="p-3 sm:p-3.5 space-y-1">
@@ -419,22 +435,25 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
     <article className="group relative flex flex-col justify-between rounded-2xl border border-paper-200/80 dark:border-paper-800/80 bg-card-bg shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-400 overflow-hidden">
       <div>
         {/* Media Preview Box */}
-        <Link
-          href={`/projects/${project.slug}`}
-          className="relative block aspect-[4/3] w-full overflow-hidden bg-paper-100 dark:bg-paper-900"
-        >
-          <Image
-            src={project.cover || "/placeholder-project.jpg"}
-            alt={project.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent opacity-50 group-hover:opacity-30 transition-opacity duration-300" />
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-paper-100 dark:bg-paper-900">
+          <Link
+            href={`/projects/${project.slug}`}
+            className="absolute inset-0 block w-full h-full"
+            aria-label={project.title}
+          >
+            <Image
+              src={project.cover || "/placeholder-project.jpg"}
+              alt={project.title}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent opacity-50 group-hover:opacity-30 transition-opacity duration-300" />
+          </Link>
 
           {/* Floating Category Pills on top left */}
           {firstCategory && (
-            <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 max-w-[70%]">
+            <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 max-w-[70%] pointer-events-none">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/15 shadow-sm">
                 {firstCategory.name}
               </span>
@@ -447,28 +466,28 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
           )}
 
           {/* GitHub & Live URL Buttons - top right */}
-          {(project.repoUrl || project.liveUrl) && (
+          {(repoHref || liveHref) && (
             <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5">
-              {project.repoUrl && (
+              {repoHref && (
                 <a
-                  href={project.repoUrl}
+                  href={repoHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(project.repoUrl!, "_blank"); }}
-                  className="w-7 h-7 rounded-md bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-accent-500 transition-colors"
-                  title="Lihat Repositori GitHub"
+                  className="w-7 h-7 rounded-md bg-black/70 hover:bg-accent-500 text-white flex items-center justify-center backdrop-blur-sm transition-all duration-200 shadow-sm hover:scale-110 active:scale-95"
+                  title="Buka Repositori GitHub"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <Github className="w-3.5 h-3.5" />
                 </a>
               )}
-              {project.liveUrl && (
+              {liveHref && (
                 <a
-                  href={project.liveUrl}
+                  href={liveHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(project.liveUrl!, "_blank"); }}
-                  className="w-7 h-7 rounded-md bg-black/60 backdrop-blur-sm text-white flex items-center justify-center hover:bg-accent-500 transition-colors"
+                  className="w-7 h-7 rounded-md bg-black/70 hover:bg-accent-500 text-white flex items-center justify-center backdrop-blur-sm transition-all duration-200 shadow-sm hover:scale-110 active:scale-95"
                   title="Buka Live Demo"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <Globe className="w-3.5 h-3.5" />
                 </a>
@@ -477,12 +496,12 @@ export function ProjectCard({ project, layout = "standard", index = 0 }: Project
           )}
 
           {/* Hover Arrow */}
-          <div className="absolute bottom-3 right-3 z-10 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+          <div className="absolute bottom-3 right-3 z-10 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white text-paper-900 dark:bg-paper-800 dark:text-paper-100 border border-paper-200 dark:border-paper-700 shadow-md">
               <ArrowUpRight className="w-3.5 h-3.5" />
             </span>
           </div>
-        </Link>
+        </div>
 
         {/* Content Body */}
         <div className="p-4 sm:p-5 space-y-2">
