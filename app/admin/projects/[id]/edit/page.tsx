@@ -57,6 +57,7 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
     featured: project.featured,
     status: project.status,
     order: project.order,
+    projectType: project.projectType || "default",
   };
 
   return <AdminProjectForm initialData={initialData} categories={categories} isEditing={true} />;

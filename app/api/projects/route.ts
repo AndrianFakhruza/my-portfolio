@@ -98,6 +98,7 @@ export async function POST(request: Request) {
         featured: Boolean(data.featured),
         status: data.status || "published",
         order: Number(data.order) || 0,
+        projectType: data.projectType || "default",
       },
       include: {
         categories: true,

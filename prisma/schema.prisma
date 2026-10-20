@@ -45,6 +45,7 @@ model Project {
   featured    Boolean  @default(false)
   status      String   @default("published") // published, draft
   order       Int      @default(0)
+  projectType String   @default("default") // "default" | "gallery"
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

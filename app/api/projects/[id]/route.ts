@@ -88,6 +88,7 @@ export async function PUT(
         featured: data.featured !== undefined ? Boolean(data.featured) : existing.featured,
         status: data.status || existing.status,
         order: data.order !== undefined ? Number(data.order) : existing.order,
+        projectType: data.projectType !== undefined ? data.projectType : existing.projectType,
       },
       include: {
         categories: true,

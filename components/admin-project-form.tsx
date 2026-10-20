@@ -16,6 +16,7 @@ import {
   Edit3,
   ImageIcon,
   ImagePlus,
+  FileText,
 } from "lucide-react";
 import { slugify } from "@/lib/utils";
 import { MarkdownRenderer } from "./markdown-renderer";
@@ -48,6 +49,7 @@ interface ProjectData {
   featured: boolean;
   status: string;
   order: number;
+  projectType: string;
 }
 
 interface AdminProjectFormProps {
@@ -85,6 +87,7 @@ export function AdminProjectForm({
     featured: initialData?.featured || false,
     status: initialData?.status || "published",
     order: initialData?.order ?? 0,
+    projectType: initialData?.projectType || "default",
   });
 
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
@@ -235,6 +238,12 @@ export function AdminProjectForm({
         throw new Error("Pilih minimal satu kategori proyek");
       }
 
+      // Untuk tipe gallery, otomatis set cover dari gambar pertama jika cover kosong
+      let submitData = { ...formData };
+      if (submitData.projectType === "gallery" && !submitData.cover && submitData.gallery.length > 0) {
+        submitData = { ...submitData, cover: submitData.gallery[0].url };
+      }
+
       const url = isEditing
         ? `/api/projects/${initialData?.id}`
         : "/api/projects";
@@ -243,7 +252,7 @@ export function AdminProjectForm({
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       const data = await res.json();
@@ -306,6 +315,82 @@ export function AdminProjectForm({
         </div>
       )}
 
+      {/* Pemilih Tipe Proyek */}
+      <div className="space-y-3">
+        <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
+          Tipe Proyek <span className="text-accent-500">*</span>
+        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Default: Studi Kasus */}
+          <button
+            type="button"
+            onClick={() => setFormData((prev) => ({ ...prev, projectType: "default" }))}
+            className={`relative flex items-start gap-4 p-4 border-2 rounded-xl text-left transition-all duration-200 cursor-pointer ${
+              formData.projectType === "default"
+                ? "border-accent-500 bg-accent-500/5 shadow-md shadow-accent-500/10"
+                : "border-paper-200 dark:border-paper-800 bg-card-bg hover:border-paper-400 dark:hover:border-paper-600"
+            }`}
+          >
+            <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              formData.projectType === "default"
+                ? "bg-accent-500 text-white"
+                : "bg-paper-100 dark:bg-paper-900 text-paper-500 dark:text-paper-400"
+            }`}>
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <p className={`text-sm font-bold ${
+                formData.projectType === "default" ? "text-accent-500" : "text-paper-900 dark:text-paper-100"
+              }`}>
+                Proyek Studi Kasus
+              </p>
+              <p className="text-[11px] text-paper-500 dark:text-paper-400 mt-0.5 leading-relaxed">
+                Proyek dengan konten markdown, link GitHub dan live demo
+              </p>
+            </div>
+            {formData.projectType === "default" && (
+              <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-accent-500 flex items-center justify-center">
+                <span className="text-white text-[9px] font-bold">✓</span>
+              </div>
+            )}
+          </button>
+
+          {/* Gallery: Galeri Karya */}
+          <button
+            type="button"
+            onClick={() => setFormData((prev) => ({ ...prev, projectType: "gallery" }))}
+            className={`relative flex items-start gap-4 p-4 border-2 rounded-xl text-left transition-all duration-200 cursor-pointer ${
+              formData.projectType === "gallery"
+                ? "border-accent-500 bg-accent-500/5 shadow-md shadow-accent-500/10"
+                : "border-paper-200 dark:border-paper-800 bg-card-bg hover:border-paper-400 dark:hover:border-paper-600"
+            }`}
+          >
+            <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              formData.projectType === "gallery"
+                ? "bg-accent-500 text-white"
+                : "bg-paper-100 dark:bg-paper-900 text-paper-500 dark:text-paper-400"
+            }`}>
+              <ImageIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <p className={`text-sm font-bold ${
+                formData.projectType === "gallery" ? "text-accent-500" : "text-paper-900 dark:text-paper-100"
+              }`}>
+                Galeri Karya Desain
+              </p>
+              <p className="text-[11px] text-paper-500 dark:text-paper-400 mt-0.5 leading-relaxed">
+                Upload gambar desain, diklik langsung buka lightbox
+              </p>
+            </div>
+            {formData.projectType === "gallery" && (
+              <div className="absolute top-3 right-3 w-4 h-4 rounded-full bg-accent-500 flex items-center justify-center">
+                <span className="text-white text-[9px] font-bold">✓</span>
+              </div>
+            )}
+          </button>
+        </div>
+      </div>
+
       {/* Main Form Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column (Primary Details) */}
@@ -332,11 +417,13 @@ export function AdminProjectForm({
 
             <div className="space-y-1.5">
               <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
-                Ringkasan Singkat (Summary) <span className="text-accent-500">*</span>
+                Ringkasan Singkat (Summary){" "}
+                {formData.projectType !== "gallery" && <span className="text-accent-500">*</span>}
+                {formData.projectType === "gallery" && <span className="text-paper-400 text-[10px] font-normal">(opsional)</span>}
               </label>
               <textarea
                 rows={3}
-                required
+                required={formData.projectType !== "gallery"}
                 value={formData.summary}
                 onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                 placeholder="Ringkasan 1-2 kalimat untuk kartu portofolio..."
@@ -346,6 +433,7 @@ export function AdminProjectForm({
           </div>
 
           {/* Case Study Content (Markdown) */}
+          {formData.projectType !== "gallery" && (
           <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
             <div className="flex items-center justify-between border-b border-paper-200 dark:border-paper-800 pb-3">
               <label className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
@@ -393,6 +481,7 @@ export function AdminProjectForm({
               </div>
             )}
           </div>
+          )}
 
           {/* Gallery Manager */}
           <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
@@ -404,6 +493,11 @@ export function AdminProjectForm({
                 <p className="text-[11px] text-paper-500 dark:text-paper-400 mt-0.5">
                   Mendukung format JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 4MB per foto)
                 </p>
+                {formData.projectType === "gallery" && (
+                  <p className="text-[11px] text-accent-500 font-semibold mt-1">
+                    \u2605 Gambar pertama akan menjadi cover/thumbnail
+                  </p>
+                )}
               </div>
               <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-paper-100 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-800 dark:text-paper-200 hover:border-accent-500 transition-colors">
                 <Upload className="w-3 h-3" />
@@ -662,6 +756,7 @@ export function AdminProjectForm({
               />
             </div>
 
+            {formData.projectType !== "gallery" && (
             <div className="space-y-1.5">
               <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Tautan Live Demo (URL)
@@ -674,7 +769,9 @@ export function AdminProjectForm({
                 className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
               />
             </div>
+            )}
 
+            {formData.projectType !== "gallery" && (
             <div className="space-y-1.5">
               <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
                 Tautan Repositori GitHub (URL)
@@ -687,6 +784,7 @@ export function AdminProjectForm({
                 className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
               />
             </div>
+            )}
           </div>
         </div>
       </div>

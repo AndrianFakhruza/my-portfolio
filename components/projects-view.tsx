@@ -21,6 +21,10 @@ interface Project {
   category?: Category | null;
   categories?: Category[];
   tools?: string;
+  gallery?: string;
+  liveUrl?: string | null;
+  repoUrl?: string | null;
+  projectType?: string;
 }
 
 interface ProjectsViewProps {
