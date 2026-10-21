@@ -23,7 +23,7 @@ export default async function HomePage() {
   const designProjects = allProjects.filter((p) => p.projectType === "gallery");
 
   const featuredWebProjects = webProjects.slice(0, 3);
-  const featuredDesignProjects = designProjects.slice(0, 8);
+  const featuredDesignProjects = designProjects.slice(0, 18);
 
   return (
     <>
