@@ -133,7 +133,6 @@ export function AdminCategoriesView({ initialCategories }: { initialCategories: 
             <tr>
               <th className="py-3 px-4">Nama Kategori</th>
               <th className="py-3 px-4">Slug Filter</th>
-              <th className="py-3 px-4">Tipe Kelompok</th>
               <th className="py-3 px-4">Jumlah Proyek</th>
               <th className="py-3 px-4 text-right">Aksi</th>
             </tr>
@@ -146,11 +145,6 @@ export function AdminCategoriesView({ initialCategories }: { initialCategories: 
                 </td>
                 <td className="py-3 px-4 font-mono text-paper-500">
                   {cat.slug}
-                </td>
-                <td className="py-3 px-4 font-mono">
-                  <span className="px-2 py-0.5 rounded bg-paper-100 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 uppercase text-[10px]">
-                    {cat.type}
-                  </span>
                 </td>
                 <td className="py-3 px-4 font-mono text-paper-600 dark:text-paper-400">
                   {cat._count?.projects ?? 0} proyek terhubung
@@ -221,22 +215,6 @@ export function AdminCategoriesView({ initialCategories }: { initialCategories: 
                   <span className="text-paper-400">Slug filter otomatis:</span>
                   <span className="text-accent-500 font-semibold">{slug || "..."}</span>
                 </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
-                  Tipe Kelompok
-                </label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  className="w-full px-3 py-2 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-                >
-                  <option value="desain">Desain</option>
-                  <option value="website">Website</option>
-                  <option value="branding">Branding</option>
-                  <option value="lainnya">Lainnya</option>
-                </select>
               </div>
 
               <div className="pt-4 flex items-center justify-end gap-3">

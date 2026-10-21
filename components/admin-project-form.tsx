@@ -242,7 +242,50 @@ export function AdminProjectForm({
         throw new Error("Unggah minimal satu gambar karya desain");
       }
 
-      // Untuk tipe gallery, otomatis set title, slug, summary, cover jika kosong
+      // ── BILA TIPE GALLERY (DESAIN) & MEMBUAT BARU ──
+      // Jika user mengunggah beberapa gambar sekaligus, pecah menjadi masing-masing 1 proyek mandiri
+      if (formData.projectType === "gallery" && !isEditing) {
+        const selectedCat = categories.find((c) => formData.categoryIds.includes(c.id));
+        const catName = selectedCat ? selectedCat.name : "Desain";
+        const baseTimestamp = Date.now();
+
+        for (let i = 0; i < formData.gallery.length; i++) {
+          const item = formData.gallery[i];
+          const singleTitle = formData.title.trim()
+            ? (formData.gallery.length > 1 ? `${formData.title.trim()} (${i + 1})` : formData.title.trim())
+            : `Karya Desain ${catName} #${(baseTimestamp + i).toString().slice(-4)}`;
+
+          const singleSlug = `desain-${(baseTimestamp + i).toString().slice(-6)}-${Math.random().toString(36).slice(2, 6)}`;
+          const singleSummary = formData.summary.trim() || `Karya eksplorasi visual desain ${catName}.`;
+
+          const payload = {
+            ...formData,
+            title: singleTitle,
+            slug: singleSlug,
+            summary: singleSummary,
+            cover: item.url,
+            gallery: [item],
+            order: (formData.order ?? 0) + i,
+          };
+
+          const res = await fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || `Gagal menyimpan gambar ke-${i + 1}`);
+          }
+        }
+
+        router.push("/admin/projects");
+        router.refresh();
+        return;
+      }
+
+      // Untuk tipe gallery saat EDIT, otomatis set title, slug, summary, cover jika kosong
       let submitData = { ...formData };
       if (submitData.projectType === "gallery") {
         const selectedCat = categories.find((c) => formData.categoryIds.includes(c.id));
@@ -319,7 +362,9 @@ export function AdminProjectForm({
             ) : (
               <>
                 <Save className="w-3.5 h-3.5" />
-                Simpan Proyek
+                {formData.projectType === "gallery" && !isEditing && formData.gallery.length > 1
+                  ? `Simpan ${formData.gallery.length} Karya Desain`
+                  : "Simpan Proyek"}
               </>
             )}
           </button>
@@ -513,8 +558,8 @@ export function AdminProjectForm({
                   Mendukung format JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 4MB per foto)
                 </p>
                 {formData.projectType === "gallery" && (
-                  <p className="text-[11px] text-accent-500 font-semibold mt-1">
-                    ★ Gambar pertama akan otomatis dijadikan thumbnail di galeri
+                  <p className="text-[11px] text-accent-600 dark:text-accent-400 font-semibold mt-1">
+                    💡 Setiap gambar yang diunggah akan otomatis disimpan sebagai 1 card karya desain tersendiri di web.
                   </p>
                 )}
               </div>

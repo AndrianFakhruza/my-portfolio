@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight, Maximize2, Layers } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 
 interface Category {
   id: string;
@@ -37,28 +37,11 @@ export function DesignGalleryMasonry({
     index: number;
   } | null>(null);
 
-  const handleOpenLightbox = (project: DesignProjectItem) => {
-    let images: { url: string; caption?: string }[] = [];
-    if (project.gallery) {
-      try {
-        const parsed = JSON.parse(project.gallery);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          images = parsed.map((item: any) =>
-            typeof item === "string" ? { url: item } : { url: item.url, caption: item.caption }
-          );
-        }
-      } catch {
-        images = [];
-      }
-    }
-
-    if (images.length === 0 && project.cover) {
-      images = [{ url: project.cover }];
-    }
-
-    if (images.length > 0) {
-      setActiveItem({ images, index: 0 });
-    }
+  const handleOpenImage = (imageUrl: string, title?: string) => {
+    setActiveItem({
+      images: [{ url: imageUrl, caption: title }],
+      index: 0,
+    });
   };
 
   const handleCloseLightbox = useCallback(() => {
@@ -83,6 +66,59 @@ export function DesignGalleryMasonry({
     });
   }, [activeItem]);
 
+  // Flat list of design cards: jika ada multiple images dalam 1 data, otomatis pecah menjadi card mandiri
+  const designCards = useMemo(() => {
+    const list: Array<{
+      key: string;
+      imageUrl: string;
+      title: string;
+      category?: any;
+    }> = [];
+
+    projects.forEach((project) => {
+      let parsedGallery: { url: string; caption?: string }[] = [];
+      if (project.gallery) {
+        try {
+          const p = JSON.parse(project.gallery);
+          if (Array.isArray(p)) parsedGallery = p;
+        } catch {
+          parsedGallery = [];
+        }
+      }
+
+      const categoriesList =
+        project.categories && project.categories.length > 0
+          ? project.categories
+          : project.category
+          ? [project.category]
+          : [];
+      const firstCat = categoriesList[0];
+
+      if (parsedGallery.length > 1) {
+        parsedGallery.forEach((img, idx) => {
+          list.push({
+            key: `${project.id}-${idx}`,
+            imageUrl: img.url,
+            title: project.title ? `${project.title} (${idx + 1})` : "Karya Desain",
+            category: firstCat,
+          });
+        });
+      } else {
+        const displayImage =
+          project.cover ||
+          (parsedGallery.length > 0 ? parsedGallery[0].url : "/placeholder-project.jpg");
+        list.push({
+          key: project.id,
+          imageUrl: displayImage,
+          title: project.title || "Karya Desain",
+          category: firstCat,
+        });
+      }
+    });
+
+    return list;
+  }, [projects]);
+
   // Keyboard navigation for Lightbox
   useEffect(() => {
     if (!activeItem) return;
@@ -102,7 +138,7 @@ export function DesignGalleryMasonry({
     };
   }, [activeItem, handleCloseLightbox, handlePrev, handleNext]);
 
-  if (!projects || projects.length === 0) {
+  if (!projects || projects.length === 0 || designCards.length === 0) {
     return (
       <div className="text-center py-16 px-4 rounded-3xl border border-dashed border-paper-300 dark:border-paper-800 bg-paper-50/50 dark:bg-paper-900/20 space-y-2">
         <p className="text-sm text-paper-500 dark:text-paper-400 font-medium">
@@ -116,42 +152,18 @@ export function DesignGalleryMasonry({
     <>
       {/* ── Pinterest-Style Columns Masonry ── */}
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 space-y-4 sm:space-y-5 [column-fill:_balance]">
-        {projects.map((project) => {
-          let parsedGallery: { url: string; caption?: string }[] = [];
-          if (project.gallery) {
-            try {
-              const p = JSON.parse(project.gallery);
-              if (Array.isArray(p)) parsedGallery = p;
-            } catch {
-              parsedGallery = [];
-            }
-          }
-
-          const displayImage =
-            project.cover ||
-            (parsedGallery.length > 0 ? parsedGallery[0].url : "/placeholder-project.jpg");
-
-          const totalImages = parsedGallery.length > 0 ? parsedGallery.length : project.cover ? 1 : 0;
-
-          const categoriesList =
-            project.categories && project.categories.length > 0
-              ? project.categories
-              : project.category
-              ? [project.category]
-              : [];
-          const firstCat = categoriesList[0];
-
+        {designCards.map((card) => {
           return (
             <div
-              key={project.id}
-              onClick={() => handleOpenLightbox(project)}
+              key={card.key}
+              onClick={() => handleOpenImage(card.imageUrl, card.title)}
               className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-paper-100 dark:bg-paper-900 border border-paper-200/80 dark:border-paper-800/80 shadow-soft hover:shadow-2xl transition-all duration-300 cursor-pointer"
             >
               {/* Natural Responsive Image */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={displayImage}
-                alt={project.title || "Karya Desain"}
+                src={card.imageUrl}
+                alt={card.title}
                 className="w-full h-auto block object-cover group-hover:scale-[1.025] transition-transform duration-500 rounded-2xl"
                 loading="lazy"
               />
@@ -160,10 +172,10 @@ export function DesignGalleryMasonry({
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
 
               {/* Floating Category Pill (Top-Left) */}
-              {firstCat && (
+              {card.category && (
                 <div className="absolute top-3 left-3 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
-                    {firstCat.name}
+                    {card.category.name}
                   </span>
                 </div>
               )}
@@ -174,16 +186,6 @@ export function DesignGalleryMasonry({
                   <Maximize2 className="w-4 h-4" />
                 </span>
               </div>
-
-              {/* Multi-Image Badge (Bottom-Right) */}
-              {totalImages > 1 && (
-                <div className="absolute bottom-3 right-3 z-10">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-black/70 backdrop-blur-md text-white border border-white/20 shadow-md">
-                    <Layers className="w-3 h-3 text-accent-400" />
-                    <span>{totalImages} foto</span>
-                  </span>
-                </div>
-              )}
             </div>
           );
         })}
