@@ -238,10 +238,27 @@ export function AdminProjectForm({
         throw new Error("Pilih minimal satu kategori proyek");
       }
 
-      // Untuk tipe gallery, otomatis set cover dari gambar pertama jika cover kosong
+      if (formData.projectType === "gallery" && formData.gallery.length === 0) {
+        throw new Error("Unggah minimal satu gambar karya desain");
+      }
+
+      // Untuk tipe gallery, otomatis set title, slug, summary, cover jika kosong
       let submitData = { ...formData };
-      if (submitData.projectType === "gallery" && !submitData.cover && submitData.gallery.length > 0) {
-        submitData = { ...submitData, cover: submitData.gallery[0].url };
+      if (submitData.projectType === "gallery") {
+        const selectedCat = categories.find((c) => formData.categoryIds.includes(c.id));
+        const catName = selectedCat ? selectedCat.name : "Desain";
+        if (!submitData.title.trim()) {
+          submitData.title = `Karya Desain ${catName} #${Date.now().toString().slice(-4)}`;
+        }
+        if (!submitData.slug.trim()) {
+          submitData.slug = `desain-${Date.now().toString().slice(-6)}`;
+        }
+        if (!submitData.summary.trim()) {
+          submitData.summary = `Karya eksplorasi visual desain ${catName}.`;
+        }
+        if (submitData.gallery.length > 0) {
+          submitData.cover = submitData.gallery[0].url;
+        }
       }
 
       const url = isEditing
@@ -395,42 +412,42 @@ export function AdminProjectForm({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column (Primary Details) */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Title & Slug */}
-          <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
-                Judul Proyek <span className="text-accent-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder="mis. Nusantara Capital Dashboard"
-                className="w-full px-4 py-2.5 text-sm bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 text-paper-900 dark:text-paper-100"
-              />
-              <div className="flex items-center gap-1.5 text-[11px] font-mono text-paper-500 pt-0.5">
-                <span className="text-paper-400">URL publik:</span>
-                <span className="text-accent-500 font-semibold">/projects/{formData.slug || "..."}</span>
+          {/* Title & Slug (Hanya untuk Proyek Web) */}
+          {formData.projectType !== "gallery" && (
+            <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
+                  Judul Proyek <span className="text-accent-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required={formData.projectType !== "gallery"}
+                  value={formData.title}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  placeholder="mis. Nusantara Capital Dashboard"
+                  className="w-full px-4 py-2.5 text-sm bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 text-paper-900 dark:text-paper-100"
+                />
+                <div className="flex items-center gap-1.5 text-[11px] font-mono text-paper-500 pt-0.5">
+                  <span className="text-paper-400">URL publik:</span>
+                  <span className="text-accent-500 font-semibold">/projects/{formData.slug || "..."}</span>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
+                  Ringkasan Singkat (Summary) <span className="text-accent-500">*</span>
+                </label>
+                <textarea
+                  rows={3}
+                  required={formData.projectType !== "gallery"}
+                  value={formData.summary}
+                  onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                  placeholder="Ringkasan 1-2 kalimat untuk kartu portofolio..."
+                  className="w-full px-4 py-2.5 text-sm bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 text-paper-900 dark:text-paper-100"
+                />
               </div>
             </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
-                Ringkasan Singkat (Summary){" "}
-                {formData.projectType !== "gallery" && <span className="text-accent-500">*</span>}
-                {formData.projectType === "gallery" && <span className="text-paper-400 text-[10px] font-normal">(opsional)</span>}
-              </label>
-              <textarea
-                rows={3}
-                required={formData.projectType !== "gallery"}
-                value={formData.summary}
-                onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-                placeholder="Ringkasan 1-2 kalimat untuk kartu portofolio..."
-                className="w-full px-4 py-2.5 text-sm bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 text-paper-900 dark:text-paper-100"
-              />
-            </div>
-          </div>
+          )}
 
           {/* Case Study Content (Markdown) */}
           {formData.projectType !== "gallery" && (
@@ -488,14 +505,16 @@ export function AdminProjectForm({
             <div className="flex items-center justify-between border-b border-paper-200 dark:border-paper-800 pb-3">
               <div>
                 <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300">
-                  Galeri Gambar ({formData.gallery.length} Foto)
+                  {formData.projectType === "gallery"
+                    ? `Unggah Gambar Desain (${formData.gallery.length} Foto)`
+                    : `Galeri Gambar (${formData.gallery.length} Foto)`}
                 </h3>
                 <p className="text-[11px] text-paper-500 dark:text-paper-400 mt-0.5">
                   Mendukung format JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 4MB per foto)
                 </p>
                 {formData.projectType === "gallery" && (
                   <p className="text-[11px] text-accent-500 font-semibold mt-1">
-                    \u2605 Gambar pertama akan menjadi cover/thumbnail
+                    ★ Gambar pertama akan otomatis dijadikan thumbnail di galeri
                   </p>
                 )}
               </div>
@@ -684,108 +703,110 @@ export function AdminProjectForm({
               </p>
             </div>
 
-            <div className="space-y-1.5 pt-2">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Urutan Tampil (Opsional)
-              </label>
-              <input
-                type="number"
-                min={0}
-                value={formData.order}
-                onChange={(e) => setFormData({ ...formData, order: Math.max(0, Number(e.target.value) || 0) })}
-                className="w-full px-3 py-1.5 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
-              <p className="text-[11px] text-paper-500 dark:text-paper-400 leading-normal">
-                Beri <span className="font-semibold text-accent-500">0</span> untuk otomatis (proyek terbaru tampil paling awal). Isi angka <span className="font-semibold text-accent-500">1</span> jika ingin diprioritaskan di nomor satu paling atas.
-              </p>
-            </div>
-          </div>
-
-          {/* Cover Image */}
-          <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
-            <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300 pb-2 border-b border-paper-200 dark:border-paper-800">
-              Cover Proyek
-            </h3>
-
-            {formData.cover && (
-              <div className="relative aspect-[16/10] w-full border border-paper-200 dark:border-paper-800 bg-paper-100 overflow-hidden">
-                <Image src={formData.cover} alt="Cover" fill className="object-cover" />
+            {formData.projectType !== "gallery" && (
+              <div className="space-y-1.5 pt-2">
+                <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
+                  Urutan Tampil (Opsional)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={formData.order}
+                  onChange={(e) => setFormData({ ...formData, order: Math.max(0, Number(e.target.value) || 0) })}
+                  className="w-full px-3 py-1.5 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
+                />
+                <p className="text-[11px] text-paper-500 dark:text-paper-400 leading-normal">
+                  Beri <span className="font-semibold text-accent-500">0</span> untuk otomatis (proyek terbaru tampil paling awal). Isi angka <span className="font-semibold text-accent-500">1</span> jika ingin diprioritaskan di nomor satu paling atas.
+                </p>
               </div>
             )}
+          </div>
 
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={formData.cover}
-                onChange={(e) => setFormData({ ...formData, cover: e.target.value })}
-                placeholder="URL Gambar Cover atau Unggah..."
-                className="w-full px-3 py-2 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
-              <label className="w-full py-2.5 px-3 flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-wider border border-paper-200 dark:border-paper-800 hover:border-accent-500 cursor-pointer bg-paper-100 dark:bg-paper-900 transition-colors">
-                <Upload className="w-3.5 h-3.5" />
-                {uploadingCover ? "Mengunggah..." : "Unggah Gambar"}
+          {/* Cover Image (Hanya untuk Proyek Web) */}
+          {formData.projectType !== "gallery" && (
+            <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300 pb-2 border-b border-paper-200 dark:border-paper-800">
+                Cover Proyek
+              </h3>
+
+              {formData.cover && (
+                <div className="relative aspect-[16/10] w-full border border-paper-200 dark:border-paper-800 bg-paper-100 overflow-hidden">
+                  <Image src={formData.cover} alt="Cover" fill className="object-cover" />
+                </div>
+              )}
+
+              <div className="space-y-2">
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCoverUpload}
-                  className="hidden"
+                  type="text"
+                  value={formData.cover}
+                  onChange={(e) => setFormData({ ...formData, cover: e.target.value })}
+                  placeholder="URL Gambar Cover atau Unggah..."
+                  className="w-full px-3 py-2 text-xs font-mono bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
                 />
-              </label>
-              <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400">
-                Format: JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 4MB)
-              </p>
+                <label className="w-full py-2.5 px-3 flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-wider border border-paper-200 dark:border-paper-800 hover:border-accent-500 cursor-pointer bg-paper-100 dark:bg-paper-900 transition-colors">
+                  <Upload className="w-3.5 h-3.5" />
+                  {uploadingCover ? "Mengunggah..." : "Unggah Gambar"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverUpload}
+                    className="hidden"
+                  />
+                </label>
+                <p className="text-[11px] font-mono text-paper-500 dark:text-paper-400">
+                  Format: JPG, PNG, WebP, SVG, AVIF, GIF (Maks. 4MB)
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Metadata: Tools, Links */}
-          <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
-            <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300 pb-2 border-b border-paper-200 dark:border-paper-800">
-              Spesifikasi Karya
-            </h3>
+          {/* Metadata: Tools, Links (Hanya untuk Proyek Web) */}
+          {formData.projectType !== "gallery" && (
+            <div className="p-6 border border-paper-200 dark:border-paper-800 bg-card-bg space-y-4">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-paper-700 dark:text-paper-300 pb-2 border-b border-paper-200 dark:border-paper-800">
+                Spesifikasi Karya
+              </h3>
 
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Alat / Tools (pisahkan koma)
-              </label>
-              <input
-                type="text"
-                value={formData.tools}
-                onChange={(e) => setFormData({ ...formData, tools: e.target.value })}
-                placeholder="mis. Next.js, Figma, Tailwind, TypeScript"
-                className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
+                  Alat / Tools (pisahkan koma)
+                </label>
+                <input
+                  type="text"
+                  value={formData.tools}
+                  onChange={(e) => setFormData({ ...formData, tools: e.target.value })}
+                  placeholder="mis. Next.js, Figma, Tailwind, TypeScript"
+                  className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
+                  Tautan Live Demo (URL)
+                </label>
+                <input
+                  type="url"
+                  value={formData.liveUrl}
+                  onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
+                  Tautan Repositori GitHub (URL)
+                </label>
+                <input
+                  type="url"
+                  value={formData.repoUrl}
+                  onChange={(e) => setFormData({ ...formData, repoUrl: e.target.value })}
+                  placeholder="https://github.com/..."
+                  className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
+                />
+              </div>
             </div>
-
-            {formData.projectType !== "gallery" && (
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Tautan Live Demo (URL)
-              </label>
-              <input
-                type="url"
-                value={formData.liveUrl}
-                onChange={(e) => setFormData({ ...formData, liveUrl: e.target.value })}
-                placeholder="https://..."
-                className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
-            </div>
-            )}
-
-            {formData.projectType !== "gallery" && (
-            <div className="space-y-1.5">
-              <label className="block text-xs font-mono uppercase tracking-wider text-paper-600 dark:text-paper-400">
-                Tautan Repositori GitHub (URL)
-              </label>
-              <input
-                type="url"
-                value={formData.repoUrl}
-                onChange={(e) => setFormData({ ...formData, repoUrl: e.target.value })}
-                placeholder="https://github.com/..."
-                className="w-full px-3 py-2 text-xs bg-paper-50 dark:bg-paper-900 border border-paper-200 dark:border-paper-800 text-paper-900 dark:text-paper-100"
-              />
-            </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </form>

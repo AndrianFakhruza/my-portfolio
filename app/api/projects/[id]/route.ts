@@ -69,6 +69,17 @@ export async function PUT(
       newCategoryId = data.categoryId;
     }
 
+    let cover = data.cover || existing.cover;
+    let galleryString = typeof data.gallery === "string" ? data.gallery : JSON.stringify(data.gallery || []);
+    if (data.projectType === "gallery") {
+      try {
+        const parsed = JSON.parse(galleryString);
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.url) {
+          cover = parsed[0].url;
+        }
+      } catch {}
+    }
+
     const updated = await prisma.project.update({
       where: { id },
       data: {
@@ -79,8 +90,8 @@ export async function PUT(
         categoryId: newCategoryId || existing.categoryId,
         categories: updateCategoriesObj,
         tags: data.tags !== undefined ? data.tags : existing.tags,
-        cover: data.cover || existing.cover,
-        gallery: typeof data.gallery === "string" ? data.gallery : JSON.stringify(data.gallery || []),
+        cover,
+        gallery: galleryString,
         role: data.role !== undefined ? data.role : existing.role,
         tools: data.tools !== undefined ? data.tools : existing.tools,
         liveUrl: data.liveUrl !== undefined ? (data.liveUrl ? data.liveUrl.trim() : null) : existing.liveUrl,

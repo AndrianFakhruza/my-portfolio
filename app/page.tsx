@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ProjectCard } from "@/components/project-card";
+import { DesignGalleryMasonry } from "@/components/design-gallery-masonry";
 import { sortProjects } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +15,15 @@ export default async function HomePage() {
     where: { status: "published" },
     include: { categories: true },
     orderBy: { createdAt: "desc" },
-    take: 12,
+    take: 30,
   });
 
-  const featuredProjects = sortProjects(rawProjects).slice(0, 6);
+  const allProjects = sortProjects(rawProjects);
+  const webProjects = allProjects.filter((p) => p.projectType !== "gallery");
+  const designProjects = allProjects.filter((p) => p.projectType === "gallery");
+
+  const featuredWebProjects = webProjects.slice(0, 3);
+  const featuredDesignProjects = designProjects.slice(0, 8);
 
   return (
     <>
@@ -128,25 +134,28 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* FEATURED PROJECTS SHOWCASE */}
+        {/* SECTION 1: PROYEK WEBSITE (3 CARDS) */}
         <section className="py-12 sm:py-16 max-w-7xl mx-auto px-5 sm:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-paper-200/80 dark:border-paper-800/80">
             <div className="space-y-1.5">
+              <span className="text-xs font-mono uppercase tracking-wider text-accent-500 font-semibold">
+                Studi Kasus &amp; Rekayasa Web
+              </span>
               <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-paper-950 dark:text-paper-50">
-                Studi Kasus &amp; Eksplorasi
+                Proyek Website Pilihan
               </h2>
             </div>
             <Link
-              href="/projects"
+              href="/projects?tab=web"
               className="inline-flex items-center gap-2 text-sm font-semibold text-paper-700 dark:text-paper-300 hover:text-accent-500 transition-colors group"
             >
-              <span>Lihat Semua Proyek ({featuredProjects.length}+)</span>
+              <span>Lihat Semua Proyek Web ({webProjects.length})</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProjects.map((project, idx) => (
+            {featuredWebProjects.map((project, idx) => (
               <ProjectCard
                 key={project.id}
                 project={project}
@@ -154,6 +163,34 @@ export default async function HomePage() {
                 index={idx}
               />
             ))}
+          </div>
+        </section>
+
+        {/* SECTION 2: KARYA DESAIN (PINTEREST MASONRY) */}
+        <section className="py-12 sm:py-16 max-w-7xl mx-auto px-5 sm:px-8 border-t border-paper-200/60 dark:border-paper-800/60">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b border-paper-200/80 dark:border-paper-800/80">
+            <div className="space-y-1.5">
+              <span className="text-xs font-mono uppercase tracking-wider text-accent-500 font-semibold">
+                Galeri Visual &amp; Eksplorasi
+              </span>
+              <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-paper-950 dark:text-paper-50">
+                Karya Desain Grafis &amp; UI
+              </h2>
+            </div>
+            <Link
+              href="/projects?tab=design"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-paper-700 dark:text-paper-300 hover:text-accent-500 transition-colors group"
+            >
+              <span>Lihat Semua Karya Desain ({designProjects.length})</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="mt-8">
+            <DesignGalleryMasonry
+              projects={featuredDesignProjects}
+              emptyMessage="Belum ada karya desain yang dipublikasikan."
+            />
           </div>
         </section>
       </main>

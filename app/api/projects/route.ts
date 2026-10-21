@@ -57,6 +57,8 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
+    const isGallery = data.projectType === "gallery";
+
     const categoryIds: string[] =
       Array.isArray(data.categoryIds) && data.categoryIds.length > 0
         ? data.categoryIds
@@ -64,14 +66,42 @@ export async function POST(request: Request) {
         ? [data.categoryId]
         : [];
 
-    if (!data.title || categoryIds.length === 0 || !data.summary) {
+    if (categoryIds.length === 0) {
+      return NextResponse.json(
+        { error: "Pilih minimal satu kategori proyek" },
+        { status: 400 }
+      );
+    }
+
+    let galleryArray: any[] = [];
+    if (Array.isArray(data.gallery)) galleryArray = data.gallery;
+    else if (typeof data.gallery === "string") {
+      try {
+        galleryArray = JSON.parse(data.gallery);
+      } catch {}
+    }
+
+    if (isGallery && galleryArray.length === 0 && !data.cover) {
+      return NextResponse.json(
+        { error: "Unggah minimal satu gambar karya desain" },
+        { status: 400 }
+      );
+    }
+
+    if (!isGallery && (!data.title || !data.summary)) {
       return NextResponse.json(
         { error: "Judul, minimal satu kategori, dan ringkasan wajib diisi" },
         { status: 400 }
       );
     }
 
-    let slug = data.slug ? slugify(data.slug) : slugify(data.title);
+    const title = (data.title || (isGallery ? "Karya Desain" : "Proyek Tanpa Judul")).trim();
+    const summary = (data.summary || (isGallery ? "Karya eksplorasi desain visual" : "")).trim();
+    const cover = data.cover || galleryArray[0]?.url || "/placeholder-project.jpg";
+
+    let slug = data.slug ? slugify(data.slug) : slugify(title);
+    if (!slug) slug = `karya-${Date.now().toString().slice(-6)}`;
+
     // Ensure slug uniqueness
     const existing = await prisma.project.findUnique({ where: { slug } });
     if (existing) {
@@ -80,17 +110,17 @@ export async function POST(request: Request) {
 
     const project = await prisma.project.create({
       data: {
-        title: data.title.trim(),
+        title,
         slug,
-        summary: data.summary.trim(),
+        summary,
         content: data.content || "",
         categoryId: categoryIds[0] || null,
         categories: {
           connect: categoryIds.map((id) => ({ id })),
         },
         tags: data.tags || "",
-        cover: data.cover || "/placeholder-project.jpg",
-        gallery: typeof data.gallery === "string" ? data.gallery : JSON.stringify(data.gallery || []),
+        cover,
+        gallery: typeof data.gallery === "string" ? data.gallery : JSON.stringify(galleryArray),
         role: data.role || "",
         tools: data.tools || "",
         liveUrl: data.liveUrl ? data.liveUrl.trim() : null,
