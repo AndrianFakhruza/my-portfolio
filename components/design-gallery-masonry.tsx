@@ -27,12 +27,14 @@ interface DesignGalleryMasonryProps {
   projects: DesignProjectItem[];
   emptyMessage?: string;
   collapsible?: boolean;
+  columns?: 4 | 5 | 6;
 }
 
 export function DesignGalleryMasonry({
   projects,
   emptyMessage = "Belum ada karya desain yang diunggah.",
   collapsible = false,
+  columns = 5,
 }: DesignGalleryMasonryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -156,9 +158,15 @@ export function DesignGalleryMasonry({
 
   const shouldCollapse = collapsible && !isExpanded && designCards.length > 5;
 
+  const columnClass = {
+    4: "columns-2 sm:columns-3 md:columns-4 lg:columns-4 xl:columns-4",
+    5: "columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-5",
+    6: "columns-2 sm:columns-3 md:columns-4 lg:columns-6 xl:columns-6",
+  }[columns];
+
   return (
     <>
-      {/* ── Masonry Container (Collapsible dengan Fade & 5 Kolom) ── */}
+      {/* ── Masonry Container (Collapsible dengan Fade & Kolom Dinamis) ── */}
       <div
         ref={containerRef}
         className={cn(
@@ -166,8 +174,8 @@ export function DesignGalleryMasonry({
           shouldCollapse ? "max-h-[580px] sm:max-h-[640px] overflow-hidden" : ""
         )}
       >
-        {/* ── Pinterest-Style Columns Masonry (5 Gambar Sebaris di Desktop) ── */}
-        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-5 2xl:columns-5 gap-3.5 sm:gap-4 space-y-3.5 sm:space-y-4 [column-fill:_balance]">
+        {/* ── Pinterest-Style Columns Masonry ── */}
+        <div className={cn(columnClass, "gap-3.5 sm:gap-4 space-y-3.5 sm:space-y-4 [column-fill:_balance]")}>
           {designCards.map((card) => {
             return (
               <div

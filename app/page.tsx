@@ -190,6 +190,7 @@ export default async function HomePage() {
             <DesignGalleryMasonry
               projects={featuredDesignProjects}
               emptyMessage="Belum ada karya desain yang dipublikasikan."
+              columns={6}
             />
           </div>
         </section>
