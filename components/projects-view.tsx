@@ -99,9 +99,74 @@ function ProjectsViewContent({ initialProjects, categories }: ProjectsViewProps)
   }, [currentList, selectedCategory, searchQuery]);
 
   return (
-    <div className="space-y-8">
-      {/* ── Filters & Search Toolbar ── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 pb-6 border-b border-paper-200/80 dark:border-paper-800/80">
+    <div className="space-y-6">
+      {/* ── 1. Tab Navigasi Utama: Proyek Website vs Karya Desain (Clean Underlined Tabs) ── */}
+      <div className="flex items-center gap-6 sm:gap-8 border-b border-paper-200/80 dark:border-paper-800/80">
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("web");
+            setSelectedCategory("all");
+          }}
+          className={cn(
+            "relative pb-3 text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer",
+            activeTab === "web"
+              ? "text-paper-950 dark:text-white font-bold"
+              : "text-paper-500 dark:text-paper-400 hover:text-paper-900 dark:hover:text-paper-200"
+          )}
+        >
+          <Globe className={cn("w-4 h-4 transition-colors", activeTab === "web" ? "text-accent-500" : "text-paper-400")} />
+          <span>Proyek Website</span>
+          <span
+            className={cn(
+              "text-[11px] px-2 py-0.5 rounded-full font-mono font-semibold transition-colors",
+              activeTab === "web"
+                ? "bg-accent-500/10 text-accent-600 dark:text-accent-400 font-bold"
+                : "bg-paper-100 dark:bg-paper-800 text-paper-500 dark:text-paper-400"
+            )}
+          >
+            {webProjects.length}
+          </span>
+          {/* Active Indicator Bar */}
+          {activeTab === "web" && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent-500 rounded-full" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("design");
+            setSelectedCategory("all");
+          }}
+          className={cn(
+            "relative pb-3 text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer",
+            activeTab === "design"
+              ? "text-paper-950 dark:text-white font-bold"
+              : "text-paper-500 dark:text-paper-400 hover:text-paper-900 dark:hover:text-paper-200"
+          )}
+        >
+          <Palette className={cn("w-4 h-4 transition-colors", activeTab === "design" ? "text-amber-500" : "text-paper-400")} />
+          <span>Karya Desain</span>
+          <span
+            className={cn(
+              "text-[11px] px-2 py-0.5 rounded-full font-mono font-semibold transition-colors",
+              activeTab === "design"
+                ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold"
+                : "bg-paper-100 dark:bg-paper-800 text-paper-500 dark:text-paper-400"
+            )}
+          >
+            {designProjects.length}
+          </span>
+          {/* Active Indicator Bar */}
+          {activeTab === "design" && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500 rounded-full" />
+          )}
+        </button>
+      </div>
+
+      {/* ── 2. Toolbar Kategori (Kiri) & Kolom Pencarian (Kanan) dalam 1 Baris Sejajar ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Category Pill Tabs */}
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -110,7 +175,7 @@ function ProjectsViewContent({ initialProjects, categories }: ProjectsViewProps)
             className={cn(
               "px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border cursor-pointer",
               selectedCategory === "all"
-                ? "bg-paper-900 text-white dark:bg-white dark:text-paper-950 border-transparent shadow-sm"
+                ? "bg-paper-900 text-white dark:bg-white dark:text-paper-950 border-transparent shadow-xs"
                 : "bg-white dark:bg-paper-900/60 text-paper-600 dark:text-paper-400 border-paper-200 dark:border-paper-800 hover:border-paper-400 dark:hover:border-paper-600 hover:text-paper-900 dark:hover:text-white"
             )}
           >
@@ -130,8 +195,10 @@ function ProjectsViewContent({ initialProjects, categories }: ProjectsViewProps)
                 className={cn(
                   "px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border cursor-pointer",
                   selectedCategory === cat.slug
-                    ? "bg-[#F59E0B] text-[#18181B] font-bold border-transparent shadow-md shadow-amber-500/20"
-                    : "bg-white dark:bg-paper-900/60 text-paper-600 dark:text-paper-400 border-paper-200 dark:border-paper-800 hover:border-[#F59E0B] hover:text-[#F59E0B]"
+                    ? activeTab === "web"
+                      ? "bg-accent-500 text-white font-bold border-transparent shadow-xs"
+                      : "bg-[#F59E0B] text-[#18181B] font-bold border-transparent shadow-xs"
+                    : "bg-white dark:bg-paper-900/60 text-paper-600 dark:text-paper-400 border-paper-200 dark:border-paper-800 hover:border-paper-400 dark:hover:border-paper-600 hover:text-paper-900 dark:hover:text-white"
                 )}
               >
                 {cat.name} ({count})
@@ -140,80 +207,20 @@ function ProjectsViewContent({ initialProjects, categories }: ProjectsViewProps)
           })}
         </div>
 
-        {/* Right Column: Tab Switcher (Top) + Search Bar (Bottom) */}
-        <div className="flex flex-col items-stretch md:items-end gap-2.5 shrink-0 w-full md:w-auto">
-          {/* ── 2 Menu / Tabs Utama: Proyek Web & Karya Desain ── */}
-          <div className="inline-flex items-center p-1 rounded-xl bg-paper-100 dark:bg-paper-900 border border-paper-200/80 dark:border-paper-800/80 shadow-xs self-start md:self-end">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("web");
-                setSelectedCategory("all");
-              }}
-              className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer",
-                activeTab === "web"
-                  ? "bg-white dark:bg-paper-950 text-paper-950 dark:text-paper-50 shadow-xs font-bold border border-paper-200/60 dark:border-paper-800/60"
-                  : "text-paper-600 dark:text-paper-400 hover:text-paper-950 dark:hover:text-white"
-              )}
-            >
-              <Globe className={cn("w-3.5 h-3.5", activeTab === "web" ? "text-accent-500" : "")} />
-              <span>Proyek Website</span>
-              <span
-                className={cn(
-                  "text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold transition-colors",
-                  activeTab === "web"
-                    ? "bg-paper-100 dark:bg-paper-800 text-paper-900 dark:text-paper-100"
-                    : "bg-paper-200/60 dark:bg-paper-800/60 text-paper-500"
-                )}
-              >
-                {webProjects.length}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("design");
-                setSelectedCategory("all");
-              }}
-              className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer",
-                activeTab === "design"
-                  ? "bg-[#F59E0B] text-[#18181B] font-bold shadow-xs"
-                  : "text-paper-600 dark:text-paper-400 hover:text-paper-950 dark:hover:text-white"
-              )}
-            >
-              <Palette className="w-3.5 h-3.5" />
-              <span>Karya Desain</span>
-              <span
-                className={cn(
-                  "text-[10px] px-1.5 py-0.5 rounded-full font-mono font-bold transition-colors",
-                  activeTab === "design"
-                    ? "bg-black/15 text-[#18181B]"
-                    : "bg-paper-200/60 dark:bg-paper-800/60 text-paper-500"
-                )}
-              >
-                {designProjects.length}
-              </span>
-            </button>
-          </div>
-
-          {/* Search Input */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-paper-400 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={
-                activeTab === "web"
-                  ? "Cari website atau teknologi..."
-                  : "Cari karya desain..."
-              }
-              className="w-full pl-10 pr-4 py-2 text-xs rounded-full bg-white dark:bg-paper-900/60 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-500/10 text-paper-900 dark:text-paper-100 placeholder:text-paper-400 transition-all shadow-sm"
-            />
-          </div>
+        {/* Search Input */}
+        <div className="relative w-full sm:w-64 md:w-72 shrink-0">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-paper-400 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={
+              activeTab === "web"
+                ? "Cari website atau teknologi..."
+                : "Cari karya desain..."
+            }
+            className="w-full pl-10 pr-4 py-2 text-xs rounded-full bg-white dark:bg-paper-900/60 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-500/10 text-paper-900 dark:text-paper-100 placeholder:text-paper-400 transition-all shadow-xs"
+          />
         </div>
       </div>
 
