@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
-import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Maximize2, ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Category {
   id: string;
@@ -25,12 +26,17 @@ export interface DesignProjectItem {
 interface DesignGalleryMasonryProps {
   projects: DesignProjectItem[];
   emptyMessage?: string;
+  collapsible?: boolean;
 }
 
 export function DesignGalleryMasonry({
   projects,
   emptyMessage = "Belum ada karya desain yang diunggah.",
+  collapsible = false,
 }: DesignGalleryMasonryProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
   // Lightbox state
   const [activeItem, setActiveItem] = useState<{
     images: { url: string; caption?: string }[];
@@ -148,48 +154,92 @@ export function DesignGalleryMasonry({
     );
   }
 
+  const shouldCollapse = collapsible && !isExpanded && designCards.length > 5;
+
   return (
     <>
-      {/* ── Pinterest-Style Columns Masonry ── */}
-      <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 space-y-4 sm:space-y-5 [column-fill:_balance]">
-        {designCards.map((card) => {
-          return (
-            <div
-              key={card.key}
-              onClick={() => handleOpenImage(card.imageUrl, card.title)}
-              className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-paper-100 dark:bg-paper-900 border border-paper-200/80 dark:border-paper-800/80 shadow-soft hover:shadow-2xl transition-all duration-300 cursor-pointer"
-            >
-              {/* Natural Responsive Image */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={card.imageUrl}
-                alt={card.title}
-                className="w-full h-auto block object-cover group-hover:scale-[1.025] transition-transform duration-500 rounded-2xl"
-                loading="lazy"
-              />
+      {/* ── Masonry Container (Collapsible dengan Fade & 5 Kolom) ── */}
+      <div
+        ref={containerRef}
+        className={cn(
+          "relative transition-all duration-700 ease-in-out",
+          shouldCollapse ? "max-h-[580px] sm:max-h-[640px] overflow-hidden" : ""
+        )}
+      >
+        {/* ── Pinterest-Style Columns Masonry (5 Gambar Sebaris di Desktop) ── */}
+        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-5 2xl:columns-5 gap-3.5 sm:gap-4 space-y-3.5 sm:space-y-4 [column-fill:_balance]">
+          {designCards.map((card) => {
+            return (
+              <div
+                key={card.key}
+                onClick={() => handleOpenImage(card.imageUrl, card.title)}
+                className="break-inside-avoid group relative rounded-2xl overflow-hidden bg-paper-100 dark:bg-paper-900 border border-paper-200/80 dark:border-paper-800/80 shadow-soft hover:shadow-2xl transition-all duration-300 cursor-pointer"
+              >
+                {/* Natural Responsive Image */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={card.imageUrl}
+                  alt={card.title}
+                  className="w-full h-auto block object-cover group-hover:scale-[1.025] transition-transform duration-500 rounded-2xl"
+                  loading="lazy"
+                />
 
-              {/* Subtle Ambient Hover Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
+                {/* Subtle Ambient Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl" />
 
-              {/* Floating Category Pill (Top-Left) */}
-              {card.category && (
-                <div className="absolute top-3 left-3 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
-                    {card.category.name}
+                {/* Floating Category Pill (Top-Left) */}
+                {card.category && (
+                  <div className="absolute top-3 left-3 z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide bg-black/60 backdrop-blur-md text-white border border-white/20 shadow-sm">
+                      {card.category.name}
+                    </span>
+                  </div>
+                )}
+
+                {/* Center Maximize Icon (Hover) */}
+                <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                  <span className="w-10 h-10 rounded-full bg-white/95 dark:bg-paper-900/95 text-paper-950 dark:text-paper-50 flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-200">
+                    <Maximize2 className="w-4 h-4" />
                   </span>
                 </div>
-              )}
-
-              {/* Center Maximize Icon (Hover) */}
-              <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-                <span className="w-10 h-10 rounded-full bg-white/95 dark:bg-paper-900/95 text-paper-950 dark:text-paper-50 flex items-center justify-center shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-200">
-                  <Maximize2 className="w-4 h-4" />
-                </span>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {/* ── Batasan Fade Gradient Bawah & Tombol Panah "Lihat Lainnya" ── */}
+        {shouldCollapse && (
+          <div className="absolute inset-x-0 bottom-0 h-48 sm:h-56 bg-gradient-to-t from-paper-50 dark:from-paper-950 via-paper-50/90 dark:via-paper-950/90 to-transparent flex flex-col items-center justify-end pb-4 z-20 pointer-events-none">
+            <button
+              type="button"
+              onClick={() => setIsExpanded(true)}
+              className="pointer-events-auto group inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-paper-900 hover:bg-black dark:bg-white dark:hover:bg-paper-100 text-white dark:text-paper-950 text-xs font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <span>Lihat Lainnya</span>
+              <span className="w-6 h-6 rounded-full bg-white/15 dark:bg-black/10 flex items-center justify-center transition-transform group-hover:translate-y-0.5">
+                <ChevronDown className="w-3.5 h-3.5" />
+              </span>
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* ── Tombol Tampilkan Lebih Sedikit (Saat Expanded) ── */}
+      {collapsible && isExpanded && designCards.length > 5 && (
+        <div className="flex justify-center pt-8 pb-4">
+          <button
+            type="button"
+            onClick={() => {
+              setIsExpanded(false);
+              containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="group inline-flex items-center gap-2 px-5 py-2 rounded-full border border-paper-200 dark:border-paper-800 bg-white/80 dark:bg-paper-900/80 hover:bg-paper-100 dark:hover:bg-paper-800 text-paper-700 dark:text-paper-300 text-xs font-medium shadow-sm hover:border-accent-500 hover:text-accent-500 transition-all cursor-pointer"
+          >
+            <span>Tampilkan Lebih Sedikit</span>
+            <ChevronUp className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5" />
+          </button>
+        </div>
+      )}
 
       {/* ── Fullscreen Lightbox Modal ── */}
       {activeItem && (

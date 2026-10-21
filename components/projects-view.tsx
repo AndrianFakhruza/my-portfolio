@@ -138,6 +138,7 @@ function ProjectsViewContent({ initialProjects, categories }: ProjectsViewProps)
           onClick={() => {
             setActiveTab("design");
             setSelectedCategory("all");
+            setSearchQuery("");
           }}
           className={cn(
             "relative pb-3 text-sm font-semibold flex items-center gap-2 transition-all cursor-pointer",
@@ -207,21 +208,19 @@ function ProjectsViewContent({ initialProjects, categories }: ProjectsViewProps)
           })}
         </div>
 
-        {/* Search Input */}
-        <div className="relative w-full sm:w-64 md:w-72 shrink-0">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-paper-400 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              activeTab === "web"
-                ? "Cari website atau teknologi..."
-                : "Cari karya desain..."
-            }
-            className="w-full pl-10 pr-4 py-2 text-xs rounded-full bg-white dark:bg-paper-900/60 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-500/10 text-paper-900 dark:text-paper-100 placeholder:text-paper-400 transition-all shadow-xs"
-          />
-        </div>
+        {/* Search Input - Hanya Tampil di Menu Proyek Website */}
+        {activeTab === "web" && (
+          <div className="relative w-full sm:w-64 md:w-72 shrink-0">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-paper-400 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari website atau teknologi..."
+              className="w-full pl-10 pr-4 py-2 text-xs rounded-full bg-white dark:bg-paper-900/60 border border-paper-200 dark:border-paper-800 focus:outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-500/10 text-paper-900 dark:text-paper-100 placeholder:text-paper-400 transition-all shadow-xs"
+            />
+          </div>
+        )}
       </div>
 
       {/* ── Content Display According to Active Tab ── */}
@@ -239,8 +238,8 @@ function ProjectsViewContent({ initialProjects, categories }: ProjectsViewProps)
             ))}
           </div>
         ) : (
-          /* Design Projects: Pinterest-Style Natural Aspect-Ratio Masonry */
-          <DesignGalleryMasonry projects={filteredProjects} />
+          /* Design Projects: Pinterest-Style Natural Aspect-Ratio Masonry (5 Kolom + Fade Batasan) */
+          <DesignGalleryMasonry projects={filteredProjects} collapsible={true} />
         )
       ) : (
         /* Empty State */
