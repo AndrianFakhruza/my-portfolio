@@ -53,7 +53,7 @@ export default async function AboutPage() {
           <div className="absolute top-0 right-0 w-[450px] h-[300px] bg-amber-500/8 dark:bg-amber-500/10 blur-[100px] rounded-full pointer-events-none -z-10" />
 
           {/* ─── Hero Section ─── */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pb-10 sm:pb-12 border-b border-paper-200/80 dark:border-paper-800/80">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-10 items-center pb-10 sm:pb-12 border-b border-paper-200/80 dark:border-paper-800/80">
             <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -96,13 +96,13 @@ export default async function AboutPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="relative w-[240px] h-[240px] sm:w-[280px] sm:h-[280px]">
+            <div className="lg:col-span-5 flex justify-center lg:justify-center">
+              <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[380px] lg:h-[380px] xl:w-[410px] xl:h-[410px]">
                 <Image
                   src={(profile as any)?.profilePhoto || "/profile.png"}
                   alt={`${profile?.name ?? "Andrian Fakhruza"} - Web Developer & UI Designer`}
                   fill
-                  sizes="(max-width: 640px) 240px, 280px"
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, (max-width: 1280px) 380px, 410px"
                   className="object-cover rounded-full hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
                   priority
                 />

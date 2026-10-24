@@ -39,7 +39,7 @@ export default async function HomePage() {
           {/* Ambient blur glow in background */}
           <div className="absolute top-16 left-1/3 -translate-x-1/2 w-[600px] h-[300px] bg-accent-500/10 dark:bg-accent-500/15 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-10 items-center">
             {/* Left Column: Intro & Headline */}
             <div className="lg:col-span-7 space-y-5">
               {/* Role Pill Tag */}
@@ -112,15 +112,15 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Profile Photo (Circle, No Frame) */}
-            <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="relative w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] lg:w-[340px] lg:h-[340px]">
+            {/* Right Column: Profile Photo (Circle, No Frame, Closer & Bigger) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-center">
+              <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[380px] lg:h-[380px] xl:w-[420px] xl:h-[420px]">
                 <Image
                   src={profilePhotoSrc}
                   alt="Andrian Fakhruza - Web Developer & UI Designer"
                   fill
                   priority
-                  sizes="(max-width: 640px) 260px, (max-width: 1024px) 300px, 340px"
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, (max-width: 1280px) 380px, 420px"
                   className="object-cover rounded-full transition-transform duration-500 hover:scale-105 drop-shadow-2xl"
                 />
               </div>
