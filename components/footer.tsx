@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ArrowRight, ArrowUpRight, Mail, Github, Linkedin, ArrowUp } from "lucide-react";
 
@@ -34,20 +33,9 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 border-b border-white/10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           {/* Identity */}
-          <div className="flex items-center gap-3.5">
-            <div className="relative w-11 h-11 rounded-full overflow-hidden ring-2 ring-accent-500/60 ring-offset-2 ring-offset-[#18181B] shrink-0">
-              <Image
-                src="/profile.png"
-                alt="Andrian Fakhruza"
-                fill
-                className="object-cover"
-                sizes="44px"
-              />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-white font-display">Andrian Fakhruza</p>
-              <p className="text-xs text-white/50">Web Developer &amp; UI Designer</p>
-            </div>
+          <div className="flex flex-col">
+            <p className="text-sm font-bold text-white font-display">Andrian Fakhruza</p>
+            <p className="text-xs text-white/50 mt-0.5">Web Developer &amp; UI Designer</p>
           </div>
 
           {/* CTA Text */}

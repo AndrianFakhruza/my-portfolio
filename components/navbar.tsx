@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "./theme-toggle";
@@ -44,26 +43,14 @@ export function Navbar() {
         {/* Brand Logo & Name + Role */}
         <Link
           href="/"
-          className="group flex items-center gap-3 py-1 text-paper-900 dark:text-paper-100"
+          className="group flex flex-col py-0.5 text-paper-900 dark:text-paper-100"
         >
-          <div className="relative w-8 sm:w-9 h-8 sm:h-9 rounded-full overflow-hidden border-2 border-[#F59E0B]/60 shadow-sm group-hover:scale-105 transition-transform shrink-0">
-            <Image
-              src="/profile.png"
-              alt="Andrian Fakhruza"
-              fill
-              className="object-cover"
-              sizes="36px"
-              priority
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display font-bold text-sm sm:text-base tracking-tight leading-none group-hover:text-accent-500 transition-colors">
-              Andrian Fakhruza
-            </span>
-            <span className="text-[10px] sm:text-[11px] font-sans font-medium text-paper-500 dark:text-paper-400 tracking-wide mt-0.5 leading-none">
-              Web Developer &amp; UI Designer
-            </span>
-          </div>
+          <span className="font-display font-bold text-sm sm:text-base tracking-tight leading-none group-hover:text-accent-500 transition-colors">
+            Andrian Fakhruza
+          </span>
+          <span className="text-[10px] sm:text-[11px] font-sans font-medium text-paper-500 dark:text-paper-400 tracking-wide mt-1 leading-none">
+            Web Developer &amp; UI Designer
+          </span>
         </Link>
 
         {/* Desktop Navigation Links */}
