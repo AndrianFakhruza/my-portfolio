@@ -16,8 +16,10 @@ import {
   Loader2,
   Upload,
   Camera,
+  Sliders,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AvatarCropModal } from "@/components/avatar-crop-modal";
 
 /* ─── Types ─────────────────────────────────────────── */
 interface Profile {
@@ -135,6 +137,56 @@ export default function AdminAboutPage() {
   });
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempCropImage, setTempCropImage] = useState<string>("");
+
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setTempCropImage(dataUrl);
+        setCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const handleCropConfirm = async (croppedBlob: Blob) => {
+    setUploadingPhoto(true);
+    try {
+      const fileName = `avatar-${Date.now()}.png`;
+      const fileType = "image/png";
+
+      // 1. Minta signed URL
+      const signRes = await fetch("/api/upload", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName, fileType }),
+      });
+      const signData = await signRes.json();
+      if (!signRes.ok) throw new Error(signData.error || "Gagal mempersiapkan upload");
+
+      // 2. Upload byte PNG langsung ke Supabase
+      const uploadRes = await fetch(signData.signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": fileType },
+        body: croppedBlob,
+      });
+      if (!uploadRes.ok) throw new Error("Gagal mengirim foto ke storage");
+
+      setProfile((p) => ({ ...p, profilePhoto: signData.publicUrl }));
+      showSave("success", "Foto profil berhasil disesuaikan & disimpan!");
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah foto profil.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -470,29 +522,46 @@ export default function AdminAboutPage() {
                 )}
               </div>
               <div className="space-y-2">
-                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-paper-200 dark:border-paper-700 bg-paper-50 dark:bg-paper-900 text-sm font-medium text-paper-700 dark:text-paper-300 hover:border-amber-500 hover:text-amber-600 transition-all cursor-pointer">
-                  <Upload className="w-4 h-4" />
-                  {uploadingPhoto ? "Mengunggah..." : "Pilih Foto"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                    disabled={uploadingPhoto}
-                  />
-                </label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-paper-200 dark:border-paper-700 bg-paper-50 dark:bg-paper-900 text-sm font-medium text-paper-700 dark:text-paper-300 hover:border-amber-500 hover:text-amber-600 transition-all cursor-pointer">
+                    <Upload className="w-4 h-4" />
+                    {uploadingPhoto ? "Menyimpan..." : "Pilih Foto Baru"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelected}
+                      className="hidden"
+                      disabled={uploadingPhoto}
+                    />
+                  </label>
+
+                  {profile.profilePhoto && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempCropImage(profile.profilePhoto || "");
+                        setCropModalOpen(true);
+                      }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-sm font-medium text-amber-700 dark:text-amber-400 transition-all cursor-pointer"
+                    >
+                      <Sliders className="w-4 h-4" />
+                      <span>Sesuaikan / Edit Posisi</span>
+                    </button>
+                  )}
+
+                  {profile.profilePhoto && (
+                    <button
+                      type="button"
+                      onClick={() => setProfile((p) => ({ ...p, profilePhoto: "" }))}
+                      className="px-3 py-2 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-all"
+                    >
+                      Hapus
+                    </button>
+                  )}
+                </div>
                 <p className="text-[11px] text-paper-400 dark:text-paper-500">
-                  Gunakan foto bulat (PNG/JPG, maks. 4MB). Direkomendasikan format PNG no-background.
+                  Foto bisa digeser posisinya, di-zoom (perbesar/perkecil), atau diputar secara langsung.
                 </p>
-                {profile.profilePhoto && (
-                  <button
-                    type="button"
-                    onClick={() => setProfile((p) => ({ ...p, profilePhoto: "" }))}
-                    className="text-[11px] text-rose-500 hover:text-rose-700 underline"
-                  >
-                    Hapus foto
-                  </button>
-                )}
               </div>
             </div>
           </div>
@@ -1171,6 +1240,12 @@ export default function AdminAboutPage() {
         </div>
       )}
 
+      <AvatarCropModal
+        isOpen={cropModalOpen}
+        imageSrc={tempCropImage}
+        onClose={() => setCropModalOpen(false)}
+        onConfirm={handleCropConfirm}
+      />
       <Toast state={saveState} msg={saveMsg} />
     </div>
   );
