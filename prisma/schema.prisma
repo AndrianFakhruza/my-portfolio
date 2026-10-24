@@ -76,14 +76,15 @@ model Message {
 }
 
 model AboutProfile {
-  id        String   @id @default(cuid())
-  name      String   @default("Andrian Fakhruza")
-  tagline   String   @db.Text
-  bio1      String   @db.Text // paragraph 1
-  bio2      String   @db.Text // paragraph 2
-  location  String   @default("Lhokseumawe, Aceh")
-  cvUrl     String?  @db.Text // path to CV file
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String   @default("Andrian Fakhruza")
+  tagline      String   @db.Text
+  bio1         String   @db.Text // paragraph 1
+  bio2         String   @db.Text // paragraph 2
+  location     String   @default("Lhokseumawe, Aceh")
+  cvUrl        String?  @db.Text // path to CV file
+  profilePhoto String?  @db.Text // URL foto profil
+  updatedAt    DateTime @updatedAt
 }
 
 model Experience {

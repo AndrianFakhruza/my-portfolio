@@ -21,6 +21,7 @@ export async function PUT(req: Request) {
         bio2: data.bio2,
         location: data.location,
         cvUrl: data.cvUrl,
+        profilePhoto: data.profilePhoto ?? existing.profilePhoto,
       },
     });
   } else {

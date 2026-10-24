@@ -14,6 +14,8 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  Upload,
+  Camera,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +28,7 @@ interface Profile {
   bio2: string;
   location: string;
   cvUrl: string;
+  profilePhoto?: string;
 }
 
 interface Education {
@@ -128,7 +131,41 @@ export default function AdminAboutPage() {
     bio2: "",
     location: "",
     cvUrl: "",
+    profilePhoto: "",
   });
+
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      // 1. Minta signed URL
+      const signRes = await fetch("/api/upload", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
+      });
+      const signData = await signRes.json();
+      if (!signRes.ok) throw new Error(signData.error || "Gagal mempersiapkan upload");
+
+      // 2. Upload langsung ke Supabase
+      const uploadRes = await fetch(signData.signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type || "image/jpeg" },
+        body: file,
+      });
+      if (!uploadRes.ok) throw new Error("Gagal mengirim foto ke storage");
+
+      setProfile((p) => ({ ...p, profilePhoto: signData.publicUrl }));
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah foto profil.");
+    } finally {
+      setUploadingPhoto(false);
+      e.target.value = "";
+    }
+  };
 
   useEffect(() => {
     fetch("/api/about")
@@ -407,6 +444,58 @@ export default function AdminAboutPage() {
           <h2 className="font-semibold text-paper-800 dark:text-paper-200 text-base flex items-center gap-2">
             <User className="w-4 h-4 text-[#F59E0B]" /> Informasi Profil
           </h2>
+
+          {/* Upload Foto Profil */}
+          <div className="space-y-2">
+            <label className={labelCls}>Foto Profil</label>
+            <div className="flex items-center gap-5">
+              {/* Preview */}
+              <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-paper-200 dark:border-paper-700 bg-paper-100 dark:bg-paper-800 shrink-0">
+                {profile.profilePhoto ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profile.profilePhoto}
+                    alt="Foto Profil"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-paper-400">
+                    <Camera className="w-7 h-7" />
+                  </div>
+                )}
+                {uploadingPhoto && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-paper-200 dark:border-paper-700 bg-paper-50 dark:bg-paper-900 text-sm font-medium text-paper-700 dark:text-paper-300 hover:border-amber-500 hover:text-amber-600 transition-all cursor-pointer">
+                  <Upload className="w-4 h-4" />
+                  {uploadingPhoto ? "Mengunggah..." : "Pilih Foto"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                    disabled={uploadingPhoto}
+                  />
+                </label>
+                <p className="text-[11px] text-paper-400 dark:text-paper-500">
+                  Gunakan foto bulat (PNG/JPG, maks. 4MB). Direkomendasikan format PNG no-background.
+                </p>
+                {profile.profilePhoto && (
+                  <button
+                    type="button"
+                    onClick={() => setProfile((p) => ({ ...p, profilePhoto: "" }))}
+                    className="text-[11px] text-rose-500 hover:text-rose-700 underline"
+                  >
+                    Hapus foto
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Nama">

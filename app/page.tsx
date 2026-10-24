@@ -11,12 +11,15 @@ import { sortProjects } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const rawProjects = await prisma.project.findMany({
-    where: { status: "published" },
-    include: { categories: true },
-    orderBy: { createdAt: "desc" },
-    take: 30,
-  });
+  const [rawProjects, profile] = await Promise.all([
+    prisma.project.findMany({
+      where: { status: "published" },
+      include: { categories: true },
+      orderBy: { createdAt: "desc" },
+      take: 30,
+    }),
+    prisma.aboutProfile.findFirst(),
+  ]);
 
   const allProjects = sortProjects(rawProjects);
   const webProjects = allProjects.filter((p) => p.projectType !== "gallery");
@@ -24,6 +27,8 @@ export default async function HomePage() {
 
   const featuredWebProjects = webProjects.slice(0, 3);
   const featuredDesignProjects = designProjects.slice(0, 18);
+
+  const profilePhotoSrc = profile?.profilePhoto || "/profile.png";
 
   return (
     <>
@@ -107,28 +112,17 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Profile Photo Card */}
+            {/* Right Column: Profile Photo (Circle, No Frame) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-[320px] sm:max-w-[360px] aspect-[4/5] rounded-3xl overflow-hidden border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card hover:shadow-card-hover transition-all duration-300 group">
+              <div className="relative w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] lg:w-[340px] lg:h-[340px]">
                 <Image
-                  src="/profile.png"
+                  src={profilePhotoSrc}
                   alt="Andrian Fakhruza - Web Developer & UI Designer"
                   fill
                   priority
-                  sizes="(max-width: 1024px) 100vw, 360px"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 640px) 260px, (max-width: 1024px) 300px, 340px"
+                  className="object-cover rounded-full transition-transform duration-500 hover:scale-105 drop-shadow-2xl"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 w-max max-w-[90%] px-4 py-1.5 rounded-full bg-white/95 dark:bg-[#18181B]/95 backdrop-blur-md border border-paper-200/80 dark:border-paper-800/80 shadow-md flex items-center gap-2 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-500 shrink-0" />
-                  <span className="font-semibold text-paper-950 dark:text-paper-50 tracking-tight">
-                    Andrian Fakhruza
-                  </span>
-                  <span className="text-paper-300 dark:text-paper-700">·</span>
-                  <span className="text-paper-600 dark:text-paper-400 font-medium text-[11px]">
-                    Lhokseumawe, Aceh
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -177,21 +171,27 @@ export default async function HomePage() {
                 Karya Desain Grafis &amp; UI
               </h2>
             </div>
-            <Link
-              href="/projects?tab=design"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-paper-700 dark:text-paper-300 hover:text-accent-500 transition-colors group"
-            >
-              <span>Lihat Semua Karya Desain ({designProjects.length})</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
           </div>
 
-          <div className="mt-8">
+          {/* Masonry dengan Batas Ketinggian + Fade Gradient + Direct Link Button */}
+          <div className="mt-8 relative max-h-[520px] sm:max-h-[580px] lg:max-h-[640px] overflow-hidden">
             <DesignGalleryMasonry
               projects={featuredDesignProjects}
               emptyMessage="Belum ada karya desain yang dipublikasikan."
               columns={6}
             />
+            {/* Fade gradient + CTA button direct link */}
+            {featuredDesignProjects.length > 0 && (
+              <div className="absolute inset-x-0 bottom-0 h-48 sm:h-56 bg-gradient-to-t from-paper-50 dark:from-paper-950 via-paper-50/90 dark:via-paper-950/90 to-transparent flex flex-col items-center justify-end pb-6 pointer-events-none z-10">
+                <Link
+                  href="/projects?tab=design"
+                  className="pointer-events-auto inline-flex items-center gap-2.5 px-6 sm:px-7 py-3 rounded-full bg-paper-900 hover:bg-black dark:bg-white dark:hover:bg-paper-100 text-white dark:text-paper-950 text-xs sm:text-sm font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  <span>Lihat Semua Karya Desain ({designProjects.length})</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       </main>

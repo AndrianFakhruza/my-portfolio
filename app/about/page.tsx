@@ -96,23 +96,16 @@ export default async function AboutPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-5">
-              <div className="relative aspect-[4/5] w-full max-w-[280px] sm:max-w-xs mx-auto overflow-hidden rounded-3xl border border-paper-200/80 dark:border-paper-800/80 bg-paper-100 dark:bg-paper-900 shadow-card">
+            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+              <div className="relative w-[240px] h-[240px] sm:w-[280px] sm:h-[280px]">
                 <Image
-                  src="/profile.png"
+                  src={(profile as any)?.profilePhoto || "/profile.png"}
                   alt={`${profile?.name ?? "Andrian Fakhruza"} - Web Developer & UI Designer`}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover transition-transform duration-500 hover:scale-105"
+                  sizes="(max-width: 640px) 240px, 280px"
+                  className="object-cover rounded-full hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
                   priority
                 />
-                <div className="absolute bottom-4 left-4 right-4 z-10">
-                  <div className="px-3.5 py-2 rounded-2xl bg-white/90 dark:bg-paper-950/90 backdrop-blur-md border border-paper-200/60 dark:border-paper-800 shadow-md flex items-center justify-center text-center">
-                    <span className="text-xs font-semibold text-paper-800 dark:text-paper-200">
-                      📍 {profile?.location ?? "Lhokseumawe, Aceh"}
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
