@@ -16,9 +16,10 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const [profile, educations] = await Promise.all([
+  const [profile, educations, dbTechnologies] = await Promise.all([
     prisma.aboutProfile.findFirst(),
     prisma.education.findMany({ orderBy: { order: "asc" } }),
+    prisma.technology.findMany({ orderBy: { order: "asc" } }).catch(() => []),
   ]);
 
   // Fallback defaults if DB is temporarily empty
@@ -172,51 +173,81 @@ export default async function AboutPage() {
                 <span className="h-[1.5px] w-12 bg-paper-300 dark:bg-paper-700 inline-block" />
               </div>
 
-              {/* Exact 2 Rows of Clean Floating Logos with Smooth Hover & Animated Tooltip */}
-              <div className="space-y-8 pt-4">
-                {/* Baris 1: TypeScript, JavaScript, HTML, CSS, Tailwind CSS, PHP */}
-                <div className="flex flex-wrap items-center gap-6 sm:gap-7 md:gap-8">
-                  {TECH_ROW_1.map((tech) => (
-                    <div
-                      key={tech.name}
-                      className="relative group flex items-center justify-center cursor-pointer"
-                      aria-label={tech.name}
-                    >
-                      {/* Logo with Smooth Float/Lift Animation */}
-                      <div className="transition-all duration-300 ease-out group-hover:scale-115 group-hover:-translate-y-1.5 filter group-hover:drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)]">
-                        {tech.icon}
-                      </div>
+              {/* Dynamic or Fallback Floating Logos with Smooth Hover & Animated Tooltip */}
+              <div className="pt-4">
+                {dbTechnologies && dbTechnologies.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-6 sm:gap-7 md:gap-8">
+                    {dbTechnologies.map((tech) => (
+                      <div
+                        key={tech.id}
+                        className="relative group flex items-center justify-center cursor-pointer"
+                        aria-label={tech.name}
+                      >
+                        {/* Logo with Smooth Float/Lift Animation */}
+                        <div className="transition-all duration-300 ease-out group-hover:scale-115 group-hover:-translate-y-1.5 filter group-hover:drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)] flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={tech.iconUrl}
+                            alt={tech.name}
+                            className="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-sm select-none"
+                          />
+                        </div>
 
-                      {/* Smooth Animated Tooltip Name */}
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-paper-950/95 dark:bg-paper-800/95 text-white dark:text-paper-100 text-[11px] font-semibold tracking-wide whitespace-nowrap shadow-xl border border-paper-700/50 dark:border-paper-600/60 pointer-events-none opacity-0 scale-95 translate-y-1.5 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 transition-all duration-200 ease-out z-30">
-                        {tech.name}
-                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-paper-950/95 dark:bg-paper-800/95 border-r border-b border-paper-700/50 dark:border-paper-600/60" />
+                        {/* Smooth Animated Tooltip Name */}
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-paper-950/95 dark:bg-paper-800/95 text-white dark:text-paper-100 text-[11px] font-semibold tracking-wide whitespace-nowrap shadow-xl border border-paper-700/50 dark:border-paper-600/60 pointer-events-none opacity-0 scale-95 translate-y-1.5 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 transition-all duration-200 ease-out z-30">
+                          {tech.name}
+                          <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-paper-950/95 dark:bg-paper-800/95 border-r border-b border-paper-700/50 dark:border-paper-600/60" />
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {/* Baris 1: TypeScript, JavaScript, HTML, CSS, Tailwind CSS, PHP */}
+                    <div className="flex flex-wrap items-center gap-6 sm:gap-7 md:gap-8">
+                      {TECH_ROW_1.map((tech) => (
+                        <div
+                          key={tech.name}
+                          className="relative group flex items-center justify-center cursor-pointer"
+                          aria-label={tech.name}
+                        >
+                          {/* Logo with Smooth Float/Lift Animation */}
+                          <div className="transition-all duration-300 ease-out group-hover:scale-115 group-hover:-translate-y-1.5 filter group-hover:drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)]">
+                            {tech.icon}
+                          </div>
+
+                          {/* Smooth Animated Tooltip Name */}
+                          <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-paper-950/95 dark:bg-paper-800/95 text-white dark:text-paper-100 text-[11px] font-semibold tracking-wide whitespace-nowrap shadow-xl border border-paper-700/50 dark:border-paper-600/60 pointer-events-none opacity-0 scale-95 translate-y-1.5 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 transition-all duration-200 ease-out z-30">
+                            {tech.name}
+                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-paper-950/95 dark:bg-paper-800/95 border-r border-b border-paper-700/50 dark:border-paper-600/60" />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
 
-                {/* Baris 2: Python, Java, MySQL, PostgreSQL, Figma, Jupyter */}
-                <div className="flex flex-wrap items-center gap-6 sm:gap-7 md:gap-8">
-                  {TECH_ROW_2.map((tech) => (
-                    <div
-                      key={tech.name}
-                      className="relative group flex items-center justify-center cursor-pointer"
-                      aria-label={tech.name}
-                    >
-                      {/* Logo with Smooth Float/Lift Animation */}
-                      <div className="transition-all duration-300 ease-out group-hover:scale-115 group-hover:-translate-y-1.5 filter group-hover:drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)]">
-                        {tech.icon}
-                      </div>
+                    {/* Baris 2: Python, Java, MySQL, PostgreSQL, Figma, Jupyter */}
+                    <div className="flex flex-wrap items-center gap-6 sm:gap-7 md:gap-8">
+                      {TECH_ROW_2.map((tech) => (
+                        <div
+                          key={tech.name}
+                          className="relative group flex items-center justify-center cursor-pointer"
+                          aria-label={tech.name}
+                        >
+                          {/* Logo with Smooth Float/Lift Animation */}
+                          <div className="transition-all duration-300 ease-out group-hover:scale-115 group-hover:-translate-y-1.5 filter group-hover:drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)]">
+                            {tech.icon}
+                          </div>
 
-                      {/* Smooth Animated Tooltip Name */}
-                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-paper-950/95 dark:bg-paper-800/95 text-white dark:text-paper-100 text-[11px] font-semibold tracking-wide whitespace-nowrap shadow-xl border border-paper-700/50 dark:border-paper-600/60 pointer-events-none opacity-0 scale-95 translate-y-1.5 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 transition-all duration-200 ease-out z-30">
-                        {tech.name}
-                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-paper-950/95 dark:bg-paper-800/95 border-r border-b border-paper-700/50 dark:border-paper-600/60" />
-                      </div>
+                          {/* Smooth Animated Tooltip Name */}
+                          <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-paper-950/95 dark:bg-paper-800/95 text-white dark:text-paper-100 text-[11px] font-semibold tracking-wide whitespace-nowrap shadow-xl border border-paper-700/50 dark:border-paper-600/60 pointer-events-none opacity-0 scale-95 translate-y-1.5 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 transition-all duration-200 ease-out z-30">
+                            {tech.name}
+                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 bg-paper-950/95 dark:bg-paper-800/95 border-r border-b border-paper-700/50 dark:border-paper-600/60" />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </section>

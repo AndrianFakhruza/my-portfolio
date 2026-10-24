@@ -16,6 +16,7 @@ import {
   Loader2,
   Upload,
   Camera,
+  Cpu,
   Sliders,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -68,7 +69,14 @@ interface Capability {
   order: number;
 }
 
-type Tab = "profile" | "education" | "organization" | "experience" | "capability";
+interface Technology {
+  id: string;
+  name: string;
+  iconUrl: string;
+  order: number;
+}
+
+type Tab = "profile" | "education" | "organization" | "experience" | "capability" | "technology";
 type SaveState = "idle" | "saving" | "success" | "error";
 
 /* ─── Toast helper ───────────────────────────────────── */
@@ -403,6 +411,57 @@ export default function AdminAboutPage() {
   };
 
   /* ─── Capability Tab ──────────────────────────────── */
+  /* ─── Technology Tab ──────────────────────────────── */
+  const [technologies, setTechnologies] = useState<Technology[]>([]);
+  const [editingTech, setEditingTech] = useState<Technology | null>(null);
+  const [newTech, setNewTech] = useState(false);
+  const blankTech = (): Technology => ({ id: "", name: "", iconUrl: "", order: 0 });
+
+  useEffect(() => {
+    fetch("/api/technologies")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d)) setTechnologies(d);
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveTech = async (tech: Technology) => {
+    if (!tech.name.trim()) return alert("Nama teknologi wajib diisi");
+    if (!tech.iconUrl.trim()) return alert("Icon teknologi wajib diunggah");
+    showSave("saving");
+    try {
+      const isNew = !tech.id;
+      const r = await fetch(isNew ? "/api/technologies" : `/api/technologies/${tech.id}`, {
+        method: isNew ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(tech),
+      });
+      if (!r.ok) throw new Error();
+      const saved = await r.json();
+      setTechnologies((prev) =>
+        isNew ? [...prev, saved] : prev.map((t) => (t.id === saved.id ? saved : t))
+      );
+      setEditingTech(null);
+      setNewTech(false);
+      showSave("success", isNew ? "Teknologi berhasil ditambahkan!" : "Teknologi diperbarui!");
+    } catch {
+      showSave("error");
+    }
+  };
+
+  const deleteTech = async (id: string) => {
+    if (!confirm("Hapus icon teknologi ini?")) return;
+    showSave("saving");
+    try {
+      await fetch(`/api/technologies/${id}`, { method: "DELETE" });
+      setTechnologies((prev) => prev.filter((t) => t.id !== id));
+      showSave("success", "Dihapus");
+    } catch {
+      showSave("error");
+    }
+  };
+
   const [capabilities, setCapabilities] = useState<Capability[]>([]);
   const [editingCap, setEditingCap] = useState<Capability | null>(null);
   const [newCap, setNewCap] = useState(false);
@@ -454,6 +513,7 @@ export default function AdminAboutPage() {
     { key: "organization", label: "Organisasi", icon: Users2 },
     { key: "experience", label: "Pengalaman Kerja", icon: Briefcase },
     { key: "capability", label: "Keterampilan", icon: Wrench },
+    { key: "technology", label: "Teknologi & Alat", icon: Cpu },
   ];
 
   return (
@@ -1152,6 +1212,106 @@ export default function AdminAboutPage() {
         </div>
       )}
 
+      {/* ── 6. Technology Tab ──────────────────────────────── */}
+      {activeTab === "technology" && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-paper-800 dark:text-paper-200">
+                {technologies.length} Icon Teknologi &amp; Alat
+              </p>
+              <p className="text-xs text-paper-500 dark:text-paper-400">
+                Icon ini tampil di halaman Tentang Saya pada section "TEKNOLOGI &amp; ALAT".
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setNewTech(true);
+                setEditingTech(blankTech());
+              }}
+              disabled={newTech}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-[#18181B] shadow-md shadow-amber-500/20 transition-all disabled:opacity-50"
+            >
+              <Plus className="w-4 h-4" /> Tambah Icon Teknologi
+            </button>
+          </div>
+
+          {newTech && editingTech && !editingTech.id && (
+            <TechForm
+              tech={editingTech}
+              onChange={setEditingTech}
+              onSave={() => saveTech(editingTech)}
+              onCancel={() => {
+                setNewTech(false);
+                setEditingTech(null);
+              }}
+              isNew
+            />
+          )}
+
+          {technologies.length === 0 && !newTech ? (
+            <div className="p-8 text-center bg-white dark:bg-[#18181B] rounded-2xl border border-dashed border-paper-200 dark:border-paper-800 text-paper-400">
+              <Cpu className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm font-medium">Belum ada icon teknologi yang diunggah.</p>
+              <p className="text-xs text-paper-500 mt-1">Klik tombol &quot;Tambah Icon Teknologi&quot; di atas untuk mulai menambahkan.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {technologies.map((tech) => (
+                <div key={tech.id} className="bg-white dark:bg-[#18181B] rounded-2xl border border-paper-200/80 dark:border-paper-800/80 p-4 flex items-center justify-between gap-3 shadow-sm hover:border-amber-500/50 transition-all">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-12 h-12 rounded-xl bg-paper-100 dark:bg-paper-800/80 p-2 flex items-center justify-center shrink-0 border border-paper-200/50 dark:border-paper-700/50">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={tech.iconUrl} alt={tech.name} className="w-full h-full object-contain" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-semibold text-sm text-paper-900 dark:text-paper-100 truncate">
+                        {tech.name}
+                      </h4>
+                      <span className="text-[11px] font-mono text-paper-500">
+                        Urutan: #{tech.order}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setEditingTech({ ...tech })}
+                      className="p-1.5 rounded-lg text-paper-400 hover:text-amber-500 hover:bg-amber-500/10 transition-all"
+                      title="Edit"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteTech(tech.id)}
+                      className="p-1.5 rounded-lg text-paper-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {editingTech && editingTech.id && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+              <div className="w-full max-w-md">
+                <TechForm
+                  tech={editingTech}
+                  onChange={setEditingTech}
+                  onSave={() => saveTech(editingTech)}
+                  onCancel={() => setEditingTech(null)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── 5. Capability Tab ────────────────────────────── */}
       {activeTab === "capability" && (
         <div className="space-y-4">
@@ -1385,6 +1545,137 @@ function CapForm({
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl bg-[#F59E0B] text-[#18181B]"
         >
           <Save className="w-3.5 h-3.5" /> Simpan
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Technology Form ─────────────────────────────────── */
+function TechForm({
+  tech,
+  onChange,
+  onSave,
+  onCancel,
+  isNew,
+}: {
+  tech: Technology;
+  onChange: (t: Technology) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  isNew?: boolean;
+}) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const signRes = await fetch("/api/upload", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
+      });
+      const signData = await signRes.json();
+      if (!signRes.ok) throw new Error(signData.error || "Gagal upload");
+
+      const uploadRes = await fetch(signData.signedUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type || "image/svg+xml" },
+        body: file,
+      });
+      if (!uploadRes.ok) throw new Error("Gagal mengirim icon");
+
+      onChange({ ...tech, iconUrl: signData.publicUrl });
+    } catch (err: any) {
+      alert(err.message || "Gagal mengunggah icon.");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  return (
+    <div className="bg-white dark:bg-[#18181B] rounded-2xl border border-paper-200/80 dark:border-paper-800/80 shadow-lg p-5 space-y-4">
+      <h4 className="font-semibold text-sm text-paper-900 dark:text-paper-100 flex items-center gap-2">
+        <Cpu className="w-4 h-4 text-amber-500" />
+        {isNew ? "Tambah Icon Teknologi Baru" : "Edit Icon Teknologi"}
+      </h4>
+
+      <div className="space-y-3">
+        <div>
+          <label className={labelCls}>
+            Nama Teknologi <span className="text-amber-500">*</span>
+          </label>
+          <input
+            className={inputCls}
+            value={tech.name}
+            onChange={(e) => onChange({ ...tech, name: e.target.value })}
+            placeholder="mis. React, Next.js, Python, Figma"
+          />
+        </div>
+
+        <div>
+          <label className={labelCls}>
+            Icon Gambar / SVG <span className="text-amber-500">*</span>
+          </label>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl border border-paper-200 dark:border-paper-700 bg-paper-100 dark:bg-paper-800 p-2 flex items-center justify-center shrink-0">
+              {tech.iconUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={tech.iconUrl} alt="Preview" className="w-full h-full object-contain" />
+              ) : (
+                <span className="text-[10px] text-paper-400 text-center">Belum ada</span>
+              )}
+            </div>
+            <div className="space-y-1">
+              <label className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-paper-200 dark:border-paper-700 bg-paper-50 dark:bg-paper-900 text-xs font-semibold text-paper-700 dark:text-paper-300 hover:border-amber-500 hover:text-amber-600 transition-all cursor-pointer">
+                <Upload className="w-3.5 h-3.5" />
+                {uploading ? "Mengunggah..." : tech.iconUrl ? "Ganti Icon" : "Upload Icon"}
+                <input
+                  type="file"
+                  accept="image/*,.svg"
+                  onChange={handleIconUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
+              <p className="text-[10px] text-paper-400">
+                Format: SVG, PNG, WebP (direkomendasikan icon transparan)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className={labelCls}>Urutan Tampil (Order)</label>
+          <input
+            type="number"
+            className={inputCls}
+            value={tech.order}
+            onChange={(e) => onChange({ ...tech, order: parseInt(e.target.value) || 0 })}
+            placeholder="0"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end gap-2 pt-2 border-t border-paper-100 dark:border-paper-800/80">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-xs font-semibold rounded-xl text-paper-600 dark:text-paper-400 hover:bg-paper-100 dark:hover:bg-paper-800"
+        >
+          Batal
+        </button>
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={uploading || !tech.name.trim() || !tech.iconUrl.trim()}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-[#18181B] shadow-sm disabled:opacity-50 cursor-pointer"
+        >
+          <Save className="w-3.5 h-3.5" />
+          Simpan
         </button>
       </div>
     </div>

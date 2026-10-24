@@ -28,7 +28,7 @@ export default async function HomePage() {
   const featuredWebProjects = webProjects.slice(0, 3);
   const featuredDesignProjects = designProjects.slice(0, 18);
 
-  const profilePhotoSrc = profile?.profilePhoto || "/profile.png";
+  const profilePhotoSrc = (profile as any)?.profilePhoto || "/profile.png";
 
   return (
     <>
